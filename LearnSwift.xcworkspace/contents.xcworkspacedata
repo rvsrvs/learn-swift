@@ -2,10 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:README.md">
-   </FileRef>
-   <FileRef
-      location = "group:Advanced Swift Notes.rtfd">
+      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/README.md">
    </FileRef>
    <FileRef
       location = "group:1a. The Basics.playground">
