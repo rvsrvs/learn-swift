@@ -7,7 +7,7 @@ aka The Vanifesto
 ## Contributors
 
 learn-swift comes originally from Paul Nettle's 
-(learn-swift repo)[https://github.com/nettlep/learn-swift]. 
+[learn-swift repo](https://github.com/nettlep/learn-swift). 
 Playgrounds 1 - 23 are his original work and were created using Swift 
 version 1 by working his way through the "Language Guide" section of
  Apple's book, "The Swift Programming Language".
