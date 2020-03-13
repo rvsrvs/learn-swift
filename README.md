@@ -17,7 +17,8 @@ Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
 ## Target Audience
 
-  Programmers familiar with other, primarily OO languages.
+  Programmers familiar with other, primarily OO languages who are
+  new to Swift.
 
 ## What you'll need
 
@@ -42,13 +43,13 @@ Be familiar with:
 
 ## Swift Language Features That Are Different from ObjC/Java/JavaScript
 
-You will want to pay special attention to familiarizing yourself with the following concepts that are specific to Swift and similar languages (Rust and Haskell for example) and that are absent in various ways from Java/JavaScript/ObjC:
+You will want to pay special attention to familiarizing yourself with the following concepts that are specific to Swift and similar languages (Rust and Haskell for example) and that are absent or different in various ways from Java/JavaScript/ObjC:
 
 Current Swift features:
 
 * Types expressible as either value or reference types 
 * Sum types as first-class types in addition to Product types
-* Reified, constrained generics
+* Strongly typed, reified, constrained generics
 * Simplified syntax for functional composition techniques
 
 Coming Swift features:
@@ -56,31 +57,31 @@ Coming Swift features:
 * Direct language support of Rust-style memory ownership
 * Direct language support of concurrency constructs.  My own belief here is that Swift is going to adopt an [Actor model](https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782#actor-model-theory) for concurrency.  See below in the section on Functional Reactive Programming for how this fits into the overall architectural of an app.
 
-See below for more details on these and several other FP-related features.
+See below for more details on these and several other FP (functional programming)-related features.
 
 ## Swift Language Features That Should be Avoided
 
-The community is converging on using the functional programming aspects of Swift and deprecating the imperative programming parts. At this point it is clear that many of the imperative features of the language are there to smooth the transition from ObjC to Swift. These features remain in the language, but best practice is to use them more and more sparingly (if at all).  Because of this (and often surprisingly to those familiar only with the imperative style), best practice is to avoid the following features of Swift: 
+The community is converging on using the functional programming aspects of Swift and deprecating the imperative programming parts. At this point it is clear that many of the imperative features of the language are there to smooth the transition from ObjC to Swift. These features remain in the language, but best practice is to use them more and more sparingl, if at all.  Because of this (and often surprisingly to those familiar only with the imperative style), best practice is to avoid the following features of Swift: 
 
 ### NEVER USE
-* for-loops use Sequence higher-order methods instead 
-* while-loops outside of RunLoops in functional reactive systems, there is a while-loop at the top of a RunLoop and all code below that reacts and returns results, no other while loops are needed
-* callbacks, NotificationCenters, or similar constructions you should replace these with use of Combine Publisher(s) in every case
-* inheritance replace with a mix of generic wrappers, enums and protocol witnesses as appropriate,
-* throws in APIs that you design, you should use Result instead. `throw`-ing functions simply do not compose well and hence do not fit well inside a functional code base.
+* for-loops - use Sequence higher-order methods instead 
+* while-loops outside of `RunLoops` - in functional reactive systems, there is a while-loop at the top of a RunLoop and all code below that reacts and returns results, no other while loops are needed
+* callbacks, `NotificationCenter`s, or similar constructions - you should replace these with use of Combine Publisher(s) in every case
+* inheritance - replace with a mix of generic wrappers, enums and protocol witnesses as appropriate,
+* the `throws` keyword in APIs that you design - you should use Result instead. `throw`-ing functions simply do not compose well and hence do not fit well inside a functional code base.
 
 ### NEVER USE OUTSIDE OF MIXED IMPERATIVE/FUNCTIONAL CODEBASES
-* functions that return Void.  Void-returning functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with.
-* Array.forEach `forEach` is used to perform Void-returning functions on Sequence types.  It is itself a Void-returning function and therefore falls under the guideline of things to avoid for both what it does and what it returns.  This should be avoided except for instances of interacting with imperative code.
-* PassthroughSubject from Combine. You use PassthroughSubject in order to invoke its `send` function, which is a Void-returning function and therefore indicative of an imperative-only interface.   In a pure functional codebase this is not needed.  It is there to connect the imperative and functional parts of your codebase.
+* functions that return `Void` -  Void-returning functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with.
+* `Array.forEach` -`forEach` is used to perform Void-returning functions on Sequence types.  It is itself a Void-returning function and therefore falls under the guideline of things to avoid for both what it does and what it returns.  This should be avoided except for instances of interacting with imperative code.
+* `PassthroughSubject` from Combine. You use PassthroughSubject in order to invoke its `send` function, which is a Void-returning function and therefore indicative of an imperative-only interface.   In a pure functional codebase this is not needed.  It is there to connect the imperative and functional parts of your codebase.
 
 ### USE ONLY WITH CAREFUL CONSIDERATION
 * PATs (Protocols with Associated Types) should be reserved as a feature for people writing framework libraries.  This is still IMHO an immature area of the language. As currently constituted, they introduce a world of hurt except for very specific cases where the programmer truly understands the interactions of the various concrete types being designed. The only exception to this may be protocols which have an only an associatedtype of Self.  If you are planning to make use of PATs you may well want to do some reading on type and category theory to make sure you understand the thinking that has already gone into standard library protocols like Sequence so that you avoid reinventing wheels.
 * the `mutating` keyword on structs. This should be used only as a performance optimization after it has been proven to be to necessary.  It is frequently associated with functions returning Void.  The deprecated pattern is to create a `var` struct or class and then immediately begin mutating its values to properly configure it.  Usage of this pattern should always be replaced with inits which construct the value correctly to begin with.  Inits of this type frequently take closures so you'll want to be aware of how to use closures in your initializers.
-* var properties in structs. By default your data structures should be immutable and mutability should only be used after due consideration and a driving performance requirement.  If you make your properties `let` by default, you will find that use of the mutating keyword in the previous point simply goes away on its own.
+* `var` properties in structs. By default your data structures should be immutable and mutability should only be used after due consideration and a driving performance requirement.  If you make your properties `let` by default, you will find that use of the mutating keyword in the previous point simply goes away on its own.
 
 ### ASPIRE NOT TO USE
-* if and if-else statements (prefer the use of ternary conditionals that return values instead),  If `switch` had a language-supported form which returned values in the way that ternary if's do, switch would join this list.
+* `if` and `if-else` statements (prefer the use of ternary conditionals that return values instead),  If `switch` had a language-supported form which returned values in the way that ternary if's do, switch would join this list.
 * protocols (unless you are absolutely sure that there is only one way for each conforming concrete type to implement the protocol). Most application-level declarations of protocols do not meet this test and should use protocol witness structs instead. (you can thank me later). So, for example, Hashable and Equatable can be implemented only one way for any given type and are therefore good subjects for protocols.  CustomDebugStringConvertible frequently can be implemented in multiple ways for a given type and in those circumstances should be managed with a protocol witness rather than a conformance.  Think about this when you go to create a protocol type.
 
 Note that some of the points above are not iron-clad rules but others are. For-loops, callbacks and inheritance are never needed and should not be used.  Void-returning functions and PATs are appropriate in some specific but infrequent situations. Ternaries over if's and protocol witnesses can be aspirational.  However, all uses of the above should be carefully considered before they are employed in code.
@@ -93,7 +94,7 @@ Swift is classified as a hybrid OO-functional language, but it is clear that its
 
 * Value types are first class objects. In many OOP languages (Java, JavaScript, ObjC, Python) only reference types can be objects. In Swift, _all_ structs, classes, enums and protocols are objects.  This has important performance and memory implications especially in server side or multi-threaded code.  This is possible because underneath the covers Swift views all 'objects' as data types with associated static functions and this fact itself can be leveraged in many interesting ways.
 * Extensibility of all Types. Because of the way the type system is implemented, every type can be extended - including things like Int and CGRect.
-* Sum Types. Swift's type system includes Sum types (enums) as well as Product types (structs and classes). Many OOP type systems such as C++, Java (for now) and ObjC (for always) lack Sum types (except in a very primitive form built on C's int type).  Both Sum and Product types are required for any system of Algebraic Data Types (ADT's).  Enums allow succinct formulations of algorithms that require very clumsy circumlocutions in languages without sum types .
+* Sum Types. Swift's type system includes Sum types (enums) as well as Product types (structs and classes). Many OOP type systems such as C++, Java (for now) and ObjC (for always) lack Sum types (except in a very primitive form built on C's int type).  Both Sum and Product types are required for any system of Algebraic Data Types (ADT's).  Enums allow succinct formulations of algorithms that require very clumsy circumlocutions in languages without sum types.
 * Reified generics. In Swift, generic types are not simply hints to the compiler, but are real types subject to rigorous type checking.  The difference is that instead of typing the code for a given generic type yourself, the compiler generates (aka reifies) the type for you. Swift's generics are best thought of as functions on types which are called at compile time rather than at run time.  There's a lot of generic enhancement still to come in future versions of Swift so it is important to be aware of changes in the system.
 * Type Inference.  Swift provides type inference mechanisms built on Algebraic Data Types and reified generics that make it possible to write type safe code that would be extremely difficult to write or subsequently read in C-based languages.
 * Function composition. The features above, taken together, allow Swift to provide syntax and semantics for forms of functional composition which simply are not available in ObjC or Java (Javascript actually does much better at this).  This is probably the hardest feature for OO programmers to grasp.  In OO languages, you can pass a function to another function or invoke a function - but the syntax for writing a function or method to take other functions or methods as arguments, compose them in some manner and return the composition is (charitably put) unwieldy to use. So it very rarely is.  Fundamentally, it is composition of this sort (taking/returning other functions with strict type checking, aka "higher order functions") which differentiates functional programming from OOP. (See the John Hughes paper in the bibliography below).
