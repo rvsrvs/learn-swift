@@ -1,30 +1,29 @@
-learn-swift
+# learn-swift
 ===========
 ```
 aka The Vanifesto
 ```
 
-### Contributors
+## Contributors
 
-learn-swift comes originally from Paul Nettle's (learn-swift repo)[https://github.com/nettlep/learn-swift]. Playgrounds 1 - 23 are his original work.
+learn-swift comes originally from Paul Nettle's 
+(learn-swift repo)[https://github.com/nettlep/learn-swift]. 
+Playgrounds 1 - 23 are his original work and were created using Swift 
+version 1 by working his way through the "Language Guide" section of
+ Apple's book, "The Swift Programming Language".
 
-Thanks to Rafał Wójcik for his quick work to update these playgrounds to Swift 2 and to incorporate the Swift language changes that came with XCode 7.
+Revised markdown formatting in all playgrounds, updates to 
+Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
-Most original playgrounds updated to Swift 3 by Christopher Bell.
-
-Revised formatting and Sections > 23 are by Van Simmons
-
-Learn Apple's Swift programming language interactively through these playgrounds.
-
-### Target Audience
+## Target Audience
 
   Programmers familiar with other, primarily OO languages.
 
-### What you'll need
+## What you'll need
 
   You will need XCode 11.3 (or later) and a Mac to run it on.
 
-### Purpose & Goal
+## Purpose & Goal
 
   More than a primer, these playgrounds are intended to get programmers up to
   speed on Swift as fast as possible so they can begin using Swift productively.
@@ -33,22 +32,7 @@ Learn Apple's Swift programming language interactively through these playgrounds
   along the way. Play the 'what-if' game. These are live playgrounds which offer
   near-realtime feedback of edits.
 
-### Source of Content
-
-  Playgrounds 1 - 23 were by Paul Nettle created these while 
-  working his way through the "Language Guide" section of
-  Apple's book, "The Swift Programming Language". He states that he
-  feels the information from
-  that section is represented here fairly completely and very concisely. Many
-  of the samples come directly from the book. Some portions from the book's
-  "Language Reference" section were also included where he felt a bit more
-  information was helpful.
-
-  If you don't already have the book, it's free. You should probably get it.
-
 # Coding Guidelines
-
-Van Simmons
 
 Be familiar with:
 
