@@ -1,7 +1,10 @@
 learn-swift
 ===========
+```
+aka The Vanifesto
+```
 
-###Contributors
+### Contributors
 
 learn-swift comes originally from Paul Nettle's (learn-swift repo)[https://github.com/nettlep/learn-swift]. Playgrounds 1 - 23 are his original work.
 
@@ -13,15 +16,15 @@ Revised formatting and Sections > 23 are by Van Simmons
 
 Learn Apple's Swift programming language interactively through these playgrounds.
 
-###Target Audience
+### Target Audience
 
   Programmers familiar with other, primarily OO languages.
 
-###What you'll need
+### What you'll need
 
   You will need XCode 11.3 (or later) and a Mac to run it on.
 
-###Purpose & Goal
+### Purpose & Goal
 
   More than a primer, these playgrounds are intended to get programmers up to
   speed on Swift as fast as possible so they can begin using Swift productively.
@@ -30,21 +33,20 @@ Learn Apple's Swift programming language interactively through these playgrounds
   along the way. Play the 'what-if' game. These are live playgrounds which offer
   near-realtime feedback of edits.
 
-###Source of Content
+### Source of Content
 
-  I created these while working my way through the "Language Guide" section of
-  Apple's book, "The Swift Programming Language". I feel the information from
+  Playgrounds 1 - 23 were by Paul Nettle created these while 
+  working his way through the "Language Guide" section of
+  Apple's book, "The Swift Programming Language". He states that he
+  feels the information from
   that section is represented here fairly completely and very concisely. Many
   of the samples come directly from the book. Some portions from the book's
-  "Language Reference" section were also included where I felt a bit more
+  "Language Reference" section were also included where he felt a bit more
   information was helpful.
 
   If you don't already have the book, it's free. You should probably get it.
 
 # Coding Guidelines
-```
-The Vanifesto
-```
 
 Van Simmons
 
@@ -505,7 +507,7 @@ It’s not possible to write map because you can’t add the generic type which 
 * [OSSA improvements](https://twitter.com/johannesweiss/status/1205812075005665281) to the SIL
 * [Syntactic Sugar](https://nshipster.com/callable/) in Swift
 
-###Swift UI
+### Swift UI
 * [https://swiftwithmajid.com](https://swiftwithmajid.com)
 * [https://swiftui-lab.com](https://swiftui-lab.com)
 * [https://developer.apple.com/tutorials/swiftui/tutorials](https://developer.apple.com/tutorials/swiftui/tutorials)
