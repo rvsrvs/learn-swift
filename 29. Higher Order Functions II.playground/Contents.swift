@@ -7,10 +7,10 @@ The point of this playground is to demonstrate Swift's capabilities to
  
  This feature is generally what people are referring to when they
  speak of _functional programming_ - its use informs the entire style.
- The higher order functions from the Higher Order Functions I playground
+ The higher order functions from the *Higher Order Functions I* playground
  are part of functional programming,
  but they are not the key distinguishing factor.  The elements of
- this playground ARE what makes functional programming different and
+ _this_ playground are what makes functional programming different and
  makes it matter.
 
  Let me pause to point out that the subject matter of this playground
@@ -36,13 +36,14 @@ extension Array {
  than just invoking them.
  
  Let's assign one of those functions to a variable so that we
- can play with it a bit.
+ can look at its type signature and play with it a bit.
  */
 let f = [Int].myCompactMap
 /*:
  The important thing to learn here is that in the expression:
  `[Int].myCompactMap` we are referring to a specific function.
- In particular it is a function on a specific kind of Array: `Array<Int>`.
+ In particular it is a function on a specific kind of array:
+ `Array<Int>`.
  
  In other languages with "type erased generics"
  there is only one `Array` class and
@@ -51,8 +52,9 @@ let f = [Int].myCompactMap
  into or extract from the `Array`. In Swift the situation is different.
  When you extend a generic, Swift generates a specific, unique class
  for that combination of types, i.e. [Int] is a unique class with our
- unique function assigned to it's namespace. The creating-a-new-class
- for-every-generic technique is called "reification", btw.
+ unique function assigned to it's namespace. The
+ creating-a-new-class-for-every-generic technique is called "reification",
+ btw.
  
  Similarly, if we have a generic function on a generic type, Swift makes
  a different instantiation of that function for every different type
@@ -113,7 +115,8 @@ At least three questions that should be in your mind are:
  
  Eventually in Swift, you have to understand functions-which-take-functions AND
  functions-which-return-functions. Because every function that you
- think of as an instance method is one of those functions.
+ think of as an instance method is one of those latter functions
+ (and maybe one of the former too).
  And even more you have to understand how they compose.
  
  Quick comment on the parens in the middle.  If you left them out,
@@ -193,14 +196,14 @@ let f1c =                    f([1,2,3])
     let f1b =   [Int].myCompactMap([1,2,3])
     let f1c =                    f([1,2,3])
  */
-let r1 = [1,2,3].myCompactMap         ( { "\($0)" } )
-                                   f1a( { "\($0)" } )
+let r1 = [1,2,3].myCompactMap       ( { "\($0)" } )
+                                 f1a( { "\($0)" } )
 r1
-let r2 =   [Int].myCompactMap([1,2,3])( { "\($0)" } )
-                                   f1b( { "\($0)" } )
+let r2 = [Int].myCompactMap([1,2,3])( { "\($0)" } )
+                                 f1b( { "\($0)" } )
 r2
-let r3 =                    f([1,2,3])( { "\($0)" } )
-                                   f1c( { "\($0)" } )
+let r3 =                  f([1,2,3])( { "\($0)" } )
+                                 f1c( { "\($0)" } )
 r3
 /*:
  Ok!  now we have some values.  And look, they're all the same. Which
@@ -401,7 +404,7 @@ type(of: StructA.append)
  order.
 */
 let s1 = StructA(a:"some string").append                           (string: " 5")
-let s2 = StructA                 .append(StructA(a: "some string"))(string: " 5")
+let s2 =                  StructA.append(StructA(a: "some string"))(string: " 5")
 /*:
  All that happened there was that `StructA(a:"some string")`
  moved from before the append to immediately after and its place
@@ -530,9 +533,10 @@ type(of: c)
  of functional programming that allows you to glue existing functions
  together in really interesting ways.
  
- NB, everything we've just done, could also be done in e.g. Java or ObjC.
+ NB, everything we've just done, is frequently done in JavaScript as
+ well.  And it could also be done in e.g. Java or ObjC.
  There are two differences (and the differences are the entire
- reason that these techniques are not used there):
+ reason that these techniques are not used in Java and ObjC though):
  
  1. generics and
  2. syntax.
@@ -540,8 +544,8 @@ type(of: c)
  `flip`, `curry` and `uncurry` are real, simple, one-line
  generic functions with reified implementations, created on demand.
  Unlike in Java or ObjC, generics are not just hints to the compiler.
- Reified generics are precisely what is required to remove the boiler-
- plate code necessary to reshape functions in a general sense.
+ Reified generics are precisely what is required to remove the
+ boilerplate code necessary to reshape functions in a general sense.
  
  Without reified generics, you end up writing custom code to do
  each desired reshaping. And you don't get the boilerplate for
@@ -580,10 +584,12 @@ func >>> <A, B, C>(
  Up to now we've been reshaping single functions to our liking.
  But note that this function takes _two_ functions
  which "fit together"
- as arguments . I.e. f outputs g's input type. And it rolls them up into
- one function.  And notice that we enforce that the functions
+ as arguments . I.e. `f` outputs `g`'s input type.
+ And the `>>>` function rolls its two arguments up into
+ one function.  Notice that we enforce that the functions
  must fit together, because they both use the same generic type `B`,
- one in output position, one in input position.
+ its just that one is in output position, while the
+ other one is in input position.
  
  (Incidentally, this starts to explain why the standard style in Swift
  when doing long function declarations is to put every argument
@@ -595,7 +601,8 @@ func >>> <A, B, C>(
  naming parts and you'd be unable to figure out the compiler messages
  when you got it wrong.  And you will _always_ get something wrong).
 
- Anyway, here's an example of using our new `>>>` operator:
+ Anyway, let's do an example of using our new `>>>` operator.
+ We'll start by making some simple input functions:
  */
 let left = { (a: Int) -> Double in Double(2 * a) }
 type(of: left)
@@ -710,63 +717,3 @@ func leftright(_ val: Int) -> String { right(left(val)) }
  
  And now... we are ready to talk about more what Combine does.
  */
-import Combine
-/*:
- ## The Point - Combine recursively generates function-returning-functions
- 
- Let's look again at a subset of our simple Combine example
- (I've pulled the publishers apart for explication):
- */
-var result2 = [Int]()
-let publisher1 = [1, 2, 3].publisher
-publisher1
-let publisher2 = publisher1.map { $0 * 2 }
-publisher2
-let cancellable1 = publisher2.sink { result2.append($0) }
-cancellable1
-/*:
- Now that we know about function-returning-functions, we can actually
- describe what is going on here.  Let's discuss this line:
- 
-     let publisher1 = [1, 2, 3].publisher // return Publishers.Sequence
- 
- The Publisher being used, i.e. `Publishers.Sequence`,  has an initializer
- which accepts a closure. On the invocation of
- `.publisher`, [1, 2, 3] instantiates a Publishers.Sequence using the
- closure-accepting init.  It passes in a closure of something like
- the following form (we can't be sure bc Combine is closed-source):
- */
-enum Deliverable<T, E: Error> {
-    case complete
-    case value(T)
-    case failure(E)
-}
-
-//let closure = { ((delivery: Deliverable) -> Subscription.Demand) -> Void in
-//    var slice = ArraySlice(self)
-//    var completed = false
-//    return {
-//        guard !completed else { return }
-//        while let head = slice.first, demand = delivery(head) {
-//            slice = slice.dropFirst()
-//        }
-//        guard let head = slice.first else {
-//            delivery(.complete)
-//            completed = true
-//            return
-//        }
-//    }
-//}
- /*:
- It returns a `Publishers.Sequence`
- which we assign to `publisher1`.  Now lets examine the next line:
- 
-     let publisher2 = publisher1.map { $0 * 2 } // Publishers.Sequence
- 
- `publisher1` responds to `map` taking a closure.  `map` on `Publishers.Sequence`
- invokes another initializer of `Publishers.Sequence` which accepts a
- a closure. `publisher1`'s map implementation invokes that
- initializer passing in self and
- 
- */
-
