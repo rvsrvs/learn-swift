@@ -2,10 +2,22 @@
 ## Optionals
 * An optional value is a stored value that can either hold a value or "no value at all"
  
- * the keyword nil in Swift means "no value at all"
+ * There is a special keyword in Swift which denotes this notion of "no value at all".
+ The keyword `nil` comes from ObjectiveC where it is,
+ in a sense not of any particular type.
+ 
+ * In Swift, in almost all cases, it is an alias for the value `.none` on the
+ `Optional` type.
 
- * This is similar to assigning a stored value to "nil" 
- but Optionals work with any type of stored value, including Int, Bool, etc.
+ * `Optional`s work with any type of stored value, including Int, Bool, etc.
+ 
+ * `Optional` is used whereever you are uncertain as to whether or not a particular
+ piece of data is guaranteed to have a value.
+ 
+ * `Optional` requires another type to be "optional" over and you can denote
+ an `Optional` value in one of two ways, both referencing the the other type.
+ For example, an optional value of type integer is denoted as either:
+ `Optional<Int>` or `Int?`.  The two are exactly equivalent.
 
  *IMPORTANT:* Int? is simply syntactic sugar for Optional<Int> where Optional is a
  "generic enum" type (we'll cover enums in Playground 8) parameterized by Int.
@@ -18,13 +30,19 @@
  An optional declaration adds a "?" immediately after the explicit type. The following line
  defines a value 'someOptional' that can either hold an Int or no value at all. In this case
  we set an optional Int value to .None (similar to nil)
+ 
+ *ALSO IMPORTANT* These playgrounds will avoid the use of the `nil` keyword and instead
+ use `.none` to help drive home the point that Optionals are just another type in the Swift
+ type system and that there is absolutely nothing special about them other than that
+ the language has has added some special syntax to facilitate their use because they
+ are so pervasive.
 */
 var someOptional: Int? = .none
 type(of: someOptional)
 /*:
- We can also set it equal to nil, the compiler will assign the value correctly
+ We can also set it equal to .none, the compiler will assign the value correctly
 */
-someOptional = nil
+someOptional = .none
 /*:
  Let's try to convert a String to an Int
 
@@ -38,7 +56,7 @@ someOptional = nil
 let notNumber = "abc"
 let failedConversion = Int(notNumber)
 /*:
-Notice how failedConversion is 'nil', even though intuitively you might think that it's an Int
+Notice how failedConversion is '.none', even though intuitively you might think that it's an Int
 failedConversion
 
  Let's carry on with a successful conversion
@@ -124,9 +142,9 @@ else {
 }
 
 /*:
- Setting an optional to 'nil' sets it to be contain "no value"
+ Setting an optional to '.none' sets it to be contain "no value"
 */
-optionalConvertedNumber = nil
+optionalConvertedNumber = .none
 /*:
  Now if we check it, we see that it holds no value:
 */
@@ -146,18 +164,18 @@ if let optionalIntValue = optionalConvertedNumber {
 	"optionalIntValue holds no value"
 }
 /*:
- Because of the introduction of optionals, you can no longer use nil for non-optional
+ Because of the introduction of optionals, you can no longer use .none for non-optional
  variables or constants.
 
  The following line will not compile
 ```
- var failure: String = nil // Won't compile
+ var failure: String = .none // Won't compile
 ```
  The following line will compile, because the String is optional
 */
-var noString: String? = nil
+var noString: String? = .none
 /*:
- If we create an optional without an initializer, it is automatically initialized to nil. In
+ If we create an optional without an initializer, it is automatically initialized to .none. In
  future sections, we'll learn that all values must be initialized before they are used. Because
  of this behavior, this variable is considered initialized, even though it holds no value:
 */
@@ -179,11 +197,11 @@ var assumedString: String! = "An implicitly unwrapped optional string"
 */
 let copyOfAssumedString: String = assumedString
 /*:
- Since assumedString is still an optional, we can still set it to nil. This is dangerous to do
+ Since assumedString is still an optional, we can still set it to .none. This is dangerous to do
  because we assumed it is always going to hold a value (and we gave permission to automatically
  unwrap it.) So by doing this, we are taking a risk:
 */
-assumedString = nil
+assumedString = .none
 /*:
  BE SURE that your implicitly unwrapped optionals actually hold values!
 
@@ -194,7 +212,7 @@ assumedString = nil
 
  Like any other optional, we can still check if it holds a value:
 */
-if assumedString != nil {
+if assumedString != .none {
 	"We have a value"
 }
 else {

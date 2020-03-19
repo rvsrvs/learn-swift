@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/README.md">
+      location = "container:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/README.md">
    </FileRef>
    <FileRef
       location = "group:1a. The Basics.playground">

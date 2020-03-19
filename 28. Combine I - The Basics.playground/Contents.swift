@@ -115,7 +115,6 @@ r1
  to `compose` a function by combining a) the closure argument attached
  to it with b) a function presented to it by its downstream successor Publisher.
  It then presents the function it composed upstream to its predecessor.
-
  At the top of the chain publishing a new value simply consists of
  calling the function you received from your immediate neighbor downstream.
  
