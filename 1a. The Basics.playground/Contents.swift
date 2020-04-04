@@ -118,6 +118,26 @@ print("The current value of friendlyWelcome is: \(friendlyWelcome)")
  using named parameters like `separator` and `terminator` in your function names.  In fact
  you have to use special syntax to NOT require named parameters as in the case of the list 
  variables to print in the call to `print(_, separator:, terminator:)`
+
+### The type(of:) function
+
+ Another _really_ handy function is type(of:).  It will show you the type
+ of any variable like so:
+ */
+type(of: friendlyWelcome)
+type(of: π)
+/*:
+ It can also be provided as an argument to `print`
+ */
+print(type(of: friendlyWelcome))
+print(type(of: π))
+/*:
+ Interestingly, it can also tell you the type of a function:
+ */
+print(type(of: print))
+/*:
+ As you go through these playgrounds, you will frequently want to know
+ the type of something.  Use it as often as you need.
  
 ### Variable Names
 
@@ -133,7 +153,7 @@ print("The current value of friendlyWelcome is: \(friendlyWelcome)")
  by surrounding the identifier with backticks (\`). Here's an example:
 */
 let `let` = 42.0
-/*
+/*:
  We can now use `\`let\`` like any normal variable:
 */
 x = `let`

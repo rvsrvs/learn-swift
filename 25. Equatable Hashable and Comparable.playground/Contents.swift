@@ -1,11 +1,13 @@
 /*:
  ## Equatable Hashable and Comparable
 
- Any struct which is composed only of things which are Equatable can be marked
+ Any struct or enumwhich is composed only of things
+ which are Equatable can be marked
  Equatable and will receive the default implementation.  Otherwise
  implement your own Equatable.
  
- Any struct which is composed only of things which are Hashab;e can be marked
+ Any struct or enum which is composed only of things which
+ are Hashable can be marked
  Hashable and will receive the default implementation.  Otherwise
  implement your own Hashable.
  */

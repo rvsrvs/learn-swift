@@ -1,13 +1,18 @@
 /*:
  ## Tuples
  
- Tuples are groups of values combined into a single, compound value
+ Tuples are groups of values combined into a single, compound value.
 
- Defining a Tuple - use parenthesis around the comma-delimited list of values
+ Defining a Tuple - use parenthesis around the comma-delimited list of values,
 
  This Tuple doesn't specify types, so it relies on inference
  */
 let httpError404 = (404, "Not found")
+/*:
+ Tuple values have a type denoted by their structure and are also
+ referred to as _structural_ types.
+*/
+type(of: httpError404)
 /*:
  We can also specify the type in order to avoid inferrence
 */

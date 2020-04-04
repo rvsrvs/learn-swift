@@ -3,7 +3,9 @@ import Combine
  ## Higher Order Functions III - Recursive Chaining
  
  In this playground we want to see exactly _how_ Combine uses
- functional composition to do what it does.  Remember how in
+ functional composition to do what it does.
+ We'll do this by writing our own mini version of Combine.
+ Remember how in
  "Higher Order Functions I" we saw that the the higher order functions
  on Sequence were really just wrappers around for-loops
  which abstracted away patterns of for-loop usage that you
@@ -84,7 +86,7 @@ import Combine
  ```
  
  Pretty clearly that's not a structure we want to have to maintain.
- Because what if I want do one thing on a single tap with two
+ For example, what if I want do one thing on a single tap with two
  fingers at some points in my app and something else at other
  points?  In that case,
  I have to replace that entire piece of code. So what
@@ -115,7 +117,7 @@ import Combine
  
  Let's look at our
  simplest example from the Combine I playground and see
- if we can't write something like the Combine for ourselves.
+ if we can't write something like Combine for ourselves.
  Here it is as a reminder:
  ```
  let c1 = [1, 2, 3]
@@ -199,9 +201,25 @@ extension MySequencePublisher {
  Note that this publisher, simply takes the elements of the array one at a
  time, publishes them with the `value` closure and then when it's gotten to
  the end of the array, it sends the `.complete` via the `termination` closure.
- Then it returns a MyCancellable, which for now we have left unimplemented.
  
- If you don't understand this, you should study it, it's important because
+ You should also note this publisher emits its values _immediately_ upon
+ invoking sync and _before_ it calls `return`.  So we're not showing
+ all the features of Combine because this publisher is
+ synchronous in nature.  Sort of a bummer, but this is enough for
+ us to see how Combine is architected.  In an _asynchronous_ publisher
+ the `return` would happen and the `value` and `termination` closures
+ would be invoked at some later point.  They would also have to be marked
+ `escaping`, which these are not.
+ 
+ After invoking `value` and `termination`, the publisher then returns
+ a MyCancellable.  We can see in this implemenation why MyCancellable
+ was left unimplemented - because by the
+ time we could do anything with it, the publisher will have terminated
+ any way...
+ Note that, we provide a default for termination which doesn't do anything.
+ This just lets us ignore it for now.
+ 
+ If you don't understand the above, you should study it, it's important because
  we are going to compose that function with other functions.  A lot.
  
  In this example, `termination` and `value` are our _callbacks_. All that
@@ -425,9 +443,9 @@ extension MyMapPublisher: Sinkable {
 
     func sink(
         _ termination: @escaping (Termination<Erroring>) -> Void = { _ in },
-        _ publish: @escaping (Sinking) -> Void
+        _ value: @escaping (Sinking) -> Void
     ) -> MyCancellable {
-        predecessor.sink(termination, compose(publish))
+        predecessor.sink(termination, compose(value))
     }
 }
 /*:
@@ -447,6 +465,27 @@ extension MyMapPublisher: Sinkable {
  you should be aware that that is precisely what Combine does in
  the Publisher protocol.  All of the generality that we are dealing
  with here, lives in protocol extensions.
+ 
+ It may be obvious but if you understand the line:
+```
+ predecessor.sink(termination, compose(publish))
+```
+ you are well on your way to understanding Combine.  So let's be very
+ clear about what that line is doing.
+ 
+ When you invoke `sink` on
+ a _transforming_ publisher, that publisher composes a function
+ using a) the `value` it has been provided to publish values on and
+ b) it's own internal state, in this case a `transform` function it
+ captured when it was initialized.  The output of `compose`
+ _must_ have the form of being a suitable `value` function for this
+ publisher's predecessor.  The publisher then hands the `compose`d
+ function to it's predecessor as the predecessor's own value function.
+ 
+ This step is absolutely at the heart of Combine.  Combine does
+ what it does by recursively composing chains of `value` functions
+ until it gets to the top of the chain.  It's almost like knitting
+ using functions for yarn.
  
  Now we are ready to implement the `map` function on our original publisher.
  Watch closely.  :)
