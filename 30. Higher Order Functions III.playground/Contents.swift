@@ -4,7 +4,7 @@ import Combine
  
  In this playground we want to see exactly _how_ Combine uses
  functional composition to do what it does.  Remember how in
- Higher Order Functions I we saw that the the higher order functions
+ "Higher Order Functions I" we saw that the the higher order functions
  on Sequence were really just wrappers around for-loops
  which abstracted away patterns of for-loop usage that you
  never knew existed?  Well it turns out that Combine does
@@ -190,11 +190,7 @@ extension MySequencePublisher {
         _ termination: (Termination<E>) -> Void = { _ in },
         _ value: (Published) -> Void
     ) -> MyCancellable {
-        var slice = ArraySlice(array)
-        while let head = slice.first {
-            value(head)
-            slice = slice.dropFirst()
-        }
+        array.forEach(value)
         termination(.complete)
         return MyCancellable()
     }
@@ -222,7 +218,7 @@ extension Array {
  how this looks precisely like our Combine example.
  */
 let myPublisher1 = [1, 2, 3].myPublisher
-let myCancellable1 = [1, 2, 3].myPublisher.sink { print("\($0)") }
+let myCancellable1 = myPublisher1.sink { print("\($0)") }
 /*:
  Again, this is a _very_ simplified model of what is going on,
  but it's enough to show the general concepts.  The big idea here
@@ -236,13 +232,14 @@ let myCancellable1 = [1, 2, 3].myPublisher.sink { print("\($0)") }
  particular publisher isn't really cancellable, but this is
  what we saw in Combine I as well.
  
- ### Generalized Publishers
+ ### Transforming Publishers
  
  Now lets examine the next line in our original setup:
  
      let publisher2 = publisher1.map { $0 * 2 }
  
- what this says is that `publisher1` responds to `map` taking a closure.
+ what this says is that `publisher1` responds to `map`
+ taking a closure.
  
  Lets see if we can work out what that should do for `publisher2`
  because _that_ in turn
@@ -251,7 +248,7 @@ let myCancellable1 = [1, 2, 3].myPublisher.sink { print("\($0)") }
  study this until you are sure that you understand it.
  
  First lets create a protocol for things that can have a `sink`
- function on them.  Note that this is exactly the signature
+ function on them.  Note that this is exactly the signature of the
  `sink` function on MySequencePublisher. We have only
  abstracted away the type of thing being published into
  an associatedtype
@@ -267,10 +264,11 @@ protocol Sinkable {
 }
 /*:
  Now we need to make MySequencePublisher conform to that
- protocol.  That's pretty easy, we just associate the
- generic types with the associatedtypes via a typealias
- command. (You may want to review Playground 22 if this
- is not clear).
+ protocol.  That's pretty easy since it already does,
+ we just associate the generic types with the associatedtypes
+ via a typealias and we are done.
+ (You may want to review Playground 22 if how
+ associatedtypes and typealiases work together is not clear).
  */
 extension MySequencePublisher: Sinkable {
     typealias Sinking = Published
@@ -278,31 +276,42 @@ extension MySequencePublisher: Sinkable {
 }
 /*:
  And now we are ready to implement some of the real magic of Combine -
- all the general kinds of Publishers.  We'll start with `map`.
+ all the transforming types of Publishers.  We'll start with `map`.
  (And leave all the others as an excercise for the reader :) ).
  
  Lets make a list of what we are trying to accomplish and as
  we implement each point we'll comment on it.
  We want to create a type `MyMapPublisher` which:
  
-  1. Accepts and stores a Sinkable predecessor type in its `init`.
-  2. Accepts a `transform` function in its init which transforms the
+  1. Accepts and stores a `Sinkable` predecessor type in its `init`.
+  2. Accepts a `transform` function in its `init` which transforms the
      `Published` type of the predecessor to the `Published` type of the
-     MyMapPublisher
+     `MyMapPublisher`
   3. Implements a higher-order function `compose` which accepts
      a function of type `(Published) -> Void` and returns a function
      of type `(Predecessor.Published) -> Void`
-  4. Conforms to Sinkable itself by implementing
+  4. Conforms to `Sinkable` itself by implementing
      a `sink` method which calls `compose`, passing in the `value`
      function of the sink and hands the return from compose to
      to the `value` function of the predecessor sink.
  
  Just reading that list makes me a little dizzy, frankly.  Remember when
- I told you in Higher Order Functions I that Combine is a library
+ I told you in "Higher Order Functions II" that Combine is a library
  for composing functions which compose functions?  _THAT_ list right
  above is exactly what I meant.  So lets see if we can do all that.
 
- Key thing to note here is this idea of a predecessor type.
+ The key thing to note here is this idea of a predecessor type.
+ While it is nowhere in Apple's documentation, I find
+ it useful to think of Publishers as coming in two varieties -
+ "Originating" and "Transforming".  Originating publishers sit at the
+ top of a chain and create values that are passed down the chain.
+ By definition, they can have no predecessor.  `MySequencePublisher`
+ in this playground is of the Originating type.  Transforming
+ publishers on the other hand, cannot create new values out of
+ thin air, they only act when they receive a value to transform.
+ `MyMapPublisher` is of the transforming type. By definition
+ it _must_ have a predecessor.
+ 
  The predecessor is the "upstream" object from which this publisher
  will receive values and termination.  The predecessor type,
  _must_ be sinkable for reasons which will become obvious below.
@@ -313,7 +322,10 @@ struct MyMapPublisher<Predecessor: Sinkable, Published>{
     let predecessor: Predecessor
     let transform: (Predecessor.Sinking) -> Published
     
-    init(_ predecessor: Predecessor, transform: @escaping (Predecessor.Sinking) -> Published) {
+    init(
+        _ predecessor: Predecessor,
+        _ transform: @escaping (Predecessor.Sinking) -> Published
+    ) {
         self.predecessor = predecessor
         self.transform = transform
     }
@@ -321,20 +333,31 @@ struct MyMapPublisher<Predecessor: Sinkable, Published>{
 /*:
  Ok, so 1 and 2 weren't so hard.  `MyMapPublisher` just needed to get the
  correctly constrained generic parameters into place when you think about it.
+ That is, it needed to know what type of thing it's predecessor was
+ and what type of value it would publish.  And we have to make those
+ types generic, so that we can work with any Sinkable and any Published
+ type.
+ 
  The main thing to note is that we are taking the output of the predecessor
- and tranforming it to our own output type. And because we are the
- `Map` publisher, we will do exactly what all of the other `map`
+ and tranforming it to our own output type.  _Every_ transforming publisher
+ will do precisely this.  These publishers come in a handful of forms,
+ most of which correspond to one of the higher order functions we looked
+ at on `Sequence`.  Not all of them do but, as we discussed in a previous
+ playground, many of them do for quite logical reasons.
+ 
+ And because we are the `Map` publisher, we will do
+ _exactly_ what all of the other `map`
  functions we have encountered along the way always do.
  That is, the `map` function will live inside some
- generic type and transform the generic type parameter into another type
- and then create a new generic type that is parameterized by the
- transformed type.  Hopefully you are starting to see yet again
- just how general the concept of `map` is.
+ generic and transform the type parameter of the generic
+ into another type and then create a new generic that
+ is parameterized by the transformed type.  Hopefully
+ you are seeing yet again just how general the concept of `map` is.
  
  Now let's see if we can implement the third requirement and
  implement `compose` on our map type.
  
- We could kind of use our `>>>` operator from Higher Order Functions II
+ We could kind of use our `>>>` operator from "Higher Order Functions II"
  here, so let's pull that in quickly.
  */
 precedencegroup CompositionPrecedence {
@@ -352,10 +375,11 @@ func >>> <A, B, C>(
 }
 /*:
  So I just cut and pasted that from before.  If you don't remember it,
- back up to Higher Order Functions II and review.  It will make
+ back up to the end of "Higher Order Functions II" and review.
+ The forward composition operator will make
  what we are about to do really easy to read (and almost
  as importantly, force you to focus on the functional composition
- that we are doing here).
+ that we are doing).
  
  So here's the way we meet requirement 3 above, regarding a `compose`
  function that takes the predecessor's output and maps it to our
@@ -380,11 +404,15 @@ extension MyMapPublisher {
  So there's requirement 3 from up above taken care of.  Also
  not nearly so hard as we thought it would be.
  
- The key thing
- to note here is that every different type of generalized publisher
- will implement a completely different `compose` function. That's
- what actually makes them different.  All of the other things
- we put on the publisher are actually common across every type
+ The key thing to note here is that every
+ different type of transforming publisher
+ will implement a different `compose` function, but that
+ the signature of that compose function will look _precisely_
+ the same.
+ 
+ The contents of `compose` make each transforming `Publisher`
+ different, but all of the other things
+ we attach to the publisher are actually common across every type
  we can think of.
  
  Ok, so lets implement requirement 4 and make `MyMapPublisher` conform
@@ -395,8 +423,9 @@ extension MyMapPublisher: Sinkable {
     typealias Erroring = Predecessor.Erroring
 
     func sink(
-        _ termination: @escaping (Termination<Predecessor.Erroring>) -> Void = { _ in },
-        _ publish: @escaping (Published) -> Void) -> MyCancellable {
+        _ termination: @escaping (Termination<Erroring>) -> Void = { _ in },
+        _ publish: @escaping (Sinking) -> Void
+    ) -> MyCancellable {
         predecessor.sink(termination, compose(publish))
     }
 }
@@ -409,7 +438,14 @@ extension MyMapPublisher: Sinkable {
  want to study it until you do.
  
  Note that because we have separated the `compose` function out to its
- own function, the `sink` function is in fact, extremely general.
+ own function, the `sink` function is in fact, extremely general. We
+ could in fact move this implementation to a protocol extension of
+ `Sinkable` and not have to implement it on any type which conforms
+ to `Sinkable`.  I won't here because then I'd need to change the
+ code above and it would interrupt the flow of the playground. But
+ you should be aware that that is precisely what Combine does in
+ the Publisher protocol.  All of the generality that we are dealing
+ with here, lives in protocol extensions.
  
  Now we are ready to implement the `map` function on our original publisher.
  Watch closely.  :)
@@ -418,7 +454,7 @@ extension MySequencePublisher {
     func map<T> (
         _ transform: @escaping (Published) -> T
     ) -> MyMapPublisher<Self, T> {
-        MyMapPublisher(self, transform: transform)
+        MyMapPublisher(self, transform)
     }
 }
 /*:
@@ -446,16 +482,17 @@ print("=========== New output =============")
 
 let myCancellable2 = myPublisher2.sink { print("\($0)") }
 /*:
- And... if you look below, tah-dah! we have implemented map on our original
- MySequencePublisher correctly.  We're only missing one last piece in order
- to have completely mimicked what Combine does with the map publisher.
+ And... if you look below, tah-dah! we have implemented `map` on our original
+ `MySequencePublisher` correctly.  We're only missing one last piece in order
+ to have completely mimicked what Combine does with its Map publisher.
  
  ### Recursive Composition and Chaining
  
  To truly get a feel for how Combine works, we need to implement
- chaining of all kinds of general publishers.  In the example we're working
- through here,
- we need to get MyMapPublisher to implement `map` as well so that we can chain
+ chaining of all kinds of transforming publishers. (Actually on all publishers
+ but for now we'll defer making it general across our originating publisher).
+ In the example we're working through here,
+ we need to get `MyMapPublisher` to implement `map` as well so that we can chain
  additional `map` calls onto it.
  So, let's do that, but let's do it the easy way.
  We'll start by declaring a `MyPublisher` protocol that has the `map`
@@ -465,19 +502,27 @@ protocol MyPublisher: Sinkable {
     func map<T> (_ transform: @escaping (Sinking) -> T) -> MyMapPublisher<Self, T>
 }
 /*:
- Notice that the specification for MyPublisher uses the exact same
- signature that MySequencePublisher has already specified for the `map`
- function.  Then notice that the following protocol extension uses
- the exact same implementation that we gave MySequencePublisher above.
+ Notice that the specification for `MyPublisher` uses the exact same
+ signature that `MySequencePublisher` has already specified for the `map`
+ function.  So we can just make `MySequencePublisher` conform to
+ our new `MyPublisher` protocol.
+ */
+extension MySequencePublisher: MyPublisher { }
+/*:
+ Now notice that the following protocol extension uses
+ the exact same implementation that we gave `MySequencePublisher` above.
+ So in fact we could go up above and remove the implementation of `map`
+ from `MySequencePublisher`, but then we'd have to rearrange a lot of
+ things, so I'll leave that as an exercise for the reader.
  */
 extension MyPublisher {
     func map<T> (_ transform: @escaping (Sinking) -> T) -> MyMapPublisher<Self, T> {
-        MyMapPublisher(self, transform: transform)
+        MyMapPublisher(self, transform)
     }
 }
 /*:
  And now since `MyMapPublisher` already conforms to Sinkable, we can
- just tell it to conform to MyMapPublisher.
+ just tell it to conform to `MyPublisher` for free.
  */
 extension MyMapPublisher: MyPublisher { }
 /*:
@@ -531,7 +576,7 @@ r2
  the important features of:
  
  1. Replacing callbacks with chaining
- 2. Making generalized publishers that can be implemented in a protocol
+ 2. Making transforming publishers that can be implemented in a protocol
  3. Composing each type of publisher by recursively chaining its `sink` function
     to its predecessor's `sink` function
  
@@ -541,13 +586,131 @@ r2
     pretty much all of Combine's subscribe features, in particular
     as we noted, backpressure.
  2. We have implemented only the very simplest form of Publishers,
-    the ones for `Array` and `map`.  Everything else is much more complex.
+    the ones for `Array` and `map`.  Everything else is more complex.
  3. We have completely ignored error handling
  4. We haven't explained those other really important fundamental
-    elements of generics: `zip` and `flatMap` at all.
+    elements of generics: `zip`, `reduce`, and `flatMap` at all.
  5. Everything here is synchronous and the whole point of Combine
     is really _asynchrony_.
  
- But we've made a start and in subsequent playgrounds we'll explain a lot of those
- features, we just won't implement our own version any more.
+ But we've made a start and in subsequent playgrounds we'll
+ explain a lot of those features, we just won't implement our
+ own version any more.
+ 
+ ### "Point-free" Style
+ 
+ One more thing I want to discuss before we finish talking about higher
+ order functions - the "point-free" style aka tacit programming.
+ [Wikipedia](https://en.wikipedia.org/wiki/Tacit_programming) is a pretty
+ good place to start reading more about it.
+ 
+ Point-free style is perfectly acceptable in Swift and is being
+ used more and more (not least by me), so you need to be fluent
+ with it.  The idea is that you defer creating variables as
+ much as possible and instead simply compose your function
+ from the bottom and call it once from the top. Let's work
+ our example from above in that style.
+ 
+ First we are going to need our curry function from
+ "Higher Order Functions II", so let's go ahead and declare it.
+ */
+public func curry<A, B, C>(
+    _ function: @escaping (A, B) -> C
+) -> (A) -> (B) -> C {
+    { (a: A) -> (B) -> C in
+        { (b: B) -> C in
+            function(a, b)
+        }
+    }
+}
+/*:
+ The goal in our example below is to replace all of the occurrences of
+ inlined closures with functions which Swift can
+ infer types on.  We'll remove the closures created in trailing
+ closure syntax and let map operate directly on the functions which
+ are currently being wrapped.  This can read much more cleanly and
+ strips away a lot of unnecessary syntax.
+ 
+ When looked at that way, you can see the following transformations,
+ which we will dissect one by one:
+ 
+     { $0 * 2 } => curry(*)(Int(2))
+ 
+ `curry(*)(Int(2))` here takes the `*` infix operator which is a generic
+ function of two arguments of the same type.  By currying that function
+ and partially applying the value `Int(2)` the compiler is able to infer
+ that we are talking about multiplication of two `Int`s
+ rather than multiplication on some other type and therefore can cause
+ this expression to return a function which takes one Int argument
+ and multiplies it by Int(2). Which is exactly the signature we need to
+ pass to `map` on a `MySequencePublisher` of `Int`s.
+ 
+     { Double($0) } => Double.init
+
+ All init's are static functions on the type they are associated with.
+ And it turns out that `Double.init` is overloaded on several different
+ types, one of which is Int.  So there is a function called
+ `Double.init` which takes a single argument of Int and the compiler
+ can infer that that is the one mean here.
+ 
+     { "\0" } => \.description
+
+ Swift has a special syntax for describing the functions which
+ perform `get` and `set` on a type's properties.  These are
+ referred to as `Keypath`s and they are a remarkably powerful
+ feature of the language that you can plug in anywhere you
+ need to access a getter or setter function.
+ In this case `\.description` says take
+ whatever type you have inferred us to be talking about here and
+ invoke the getter named `description` on it. Since `description`
+ returns a String, this is precisely the same as what we are doing
+ on the left hand side of the => there.
+ 
+ So here are those changes applied to our example:
+ */
+var r3 = [String]()
+let c2 = [1, 2, 3]
+    .myPublisher
+    .map(curry(*)(Int(2)))
+    .map(Double.init)
+    .map(\.description)
+    .sink { r3.append($0) }
+r3
+/*:
+ You are probably wondering why I didn't move the `sink` to be
+ point-free.  If you look closely, what we are doing in the
+ `sink` method is mutating the `r3` array.  For somewhat
+ technical reasons relating to capture semantics, I can do
+ that with a closure created in-line, but I wouldn't be able
+ to do that with a top level function.  To fix this, I'd need
+ to wrap `r3` in a reference type and mutate the value through
+ a method on the reference type.  That seemed a bit excessive
+ as I want you to focus on the style more than on all of the
+ minutiae, so for now we are leaving `sink`'s points sticking out.
+ 
+ And as I mentioned at the beginning of Combine I, any time we see
+ `map` functions following each other, we can compose the functions
+ provided to the various maps together into a single function and
+ just call map once with that single function.
+ So since we have a very handy way of composing functions
+ together, lets go ahead and do that.
+ */
+let transform = curry(*)(Int(2)) >>> Double.init >>> \.description
+/*:
+ Note that transform is of type: `(Int) -> String`. Which, to me
+ anyway, seems quite remarkable.  Just like in "Higher Order Functions II"
+ we've been able to type erase a lot of stuff and come up with
+ a glued together function which perfectly fits what we are trying to
+ do. Now we can take our composed function and use it in one single
+ `map` call.
+ */
+var r4 = [String]()
+let c3 = [1, 2, 3]
+    .myPublisher
+    .map(transform)
+    .sink { r4.append($0) }
+r4
+/*:
+ And now I think we are ready to move ahead to the other features of
+ Combine.
  */

@@ -226,8 +226,8 @@ f(4) { Double($0) }   // pass the 2nd variable in trailing closure syntax
     publisher
  
  `lazy` is a sequence which does not just contain its values - it produces
- them on demand.  `publisher` is a Combine sequence which we will discuss in excruciating
- detail in a later playground.
+ them on demand.  `publisher` is a Combine sequence which we will discuss
+ in excruciating detail in a later playground.
 
  ### Map
  
@@ -288,7 +288,7 @@ type(of: x2)
     func zip(Array<A>, Array<B>) -> Array<(A, B)>
 
  You use `zip` to take two arrays, match up the elements and combine
- then into one.
+ them into one.
 
  In words, zip transforms a tuple of arrays into an array of tuples. Like `map`,
  `zip` is an amazingly general form that applies to almost any generic you will
