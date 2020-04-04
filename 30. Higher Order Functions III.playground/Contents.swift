@@ -10,6 +10,26 @@ import Combine
  never knew existed?  Well it turns out that Combine does
  _precisely_ that same thing for _callbacks_.
  
+ So what we're going to do in this playground is take the very first
+ simple example of Combine that we experimented with in the
+ Combine I playground and implement our own version of it.
+ The idea is that by doing this, you'll gain a real understanding
+ of how Combine recursively performs function composition
+ to replace the standard callback.  For reference, here is the
+ example we hope to code up:
+ ```
+ var r2: [String] = []
+ let c1 = [1, 2, 3]
+     .publisher
+     .map { $0 * 2 }
+     .map { Double($0) }
+     .map { "\($0)" }
+     .sink { r2.append($0) }
+ ```
+ We'll be taking this example and making a `myPublisher` to replace
+ `publisher`, but other than that this code should look exactly the
+ same by the time we are done.
+ 
  ### Combine and callbacks
 
  Callbacks have, since time immemorial, been the way that programmers
@@ -77,20 +97,25 @@ import Combine
  And we see, once again, functional composition in action. Ugly,
  unmaintainable action, but action, nonetheless.
  
- So callbacks generate code that nests several levels deep,
- doesn't compose well, and contains a lot code that looks like
- boilerplate - sounds very reminiscent of what we saw with
- for-loops and the higher order functions on `Sequence`.  And
- unsurprisingly it turns out that that we can apply the same
- ideas to callbacks.  For for-loops, we made higher order functions
+ So callbacks generally consist of code that
+ 
+ 1. nests several levels deep,
+ 2. doesn't compose well, and
+ 3. contains a lot things that look like boilerplate
+ 
+ sounds very reminiscent of what we saw with
+ for-loops and the higher order functions on `Sequence`.
+ Unsurprisingly it turns out that that we can apply the same
+ ideas to callbacks that we applied to for-loops.
+ In the case of for-loops, we made higher order functions
  that used for-loops underneath and for callbacks, we'll make
  higher order functions that use callbacks underneath.
  
- ### Combine recursively generates function-returning-functions
+ ### Generateing function-returning-functions
  
  Let's look at our
  simplest example from the Combine I playground and see
- if we can't write something like the Combine code ourselves.
+ if we can't write something like the Combine for ourselves.
  Here it is as a reminder:
  ```
  let c1 = [1, 2, 3]
@@ -109,8 +134,6 @@ let publisher1 = [1, 2, 3].publisher
 publisher1
 let publisher2 = publisher1.map { $0 * 2 }
 publisher2
-let cancellable1 = publisher2.sink { result2.append($0) }
-cancellable1
 /*:
  Now that we know about function-returning-functions, we can actually
  describe what is going on here.  Let's discuss this line to start:
@@ -128,7 +151,9 @@ cancellable1
  of Combine to simplify things a bit, we can imagine that
  the `Array` publisher is implemented as something like
  the following (we can't be sure of course since Combine
- is closed-source).  First, there's an enum
+ is closed-source).
+ 
+ First, there's an enum
  that represents the termination of the sequence, either
  in a normal completion or in an error.  This is of course
  generic in the error type.
@@ -145,7 +170,8 @@ enum Termination<E: Error> {
 struct MyCancellable { }
 /*:
  Now we need a `Publisher` type which can actually take an array
- of objects and publish them.
+ of objects and publish them.  It needs to be generic in the
+ type of object published and in any errors it might generate.
  */
 struct MySequencePublisher<Published, E: Error> {
     var array: [Published]
@@ -156,8 +182,8 @@ struct MySequencePublisher<Published, E: Error> {
 }
 /*:
  The publisher needs to somehow get a sink attached to it so
- that it can emit the contents of the array into the `sink`,
- so that's a pretty simple implementation.
+ that it can emit the contents of the array into the `sink`.
+ This turns out to be pretty simple to implement.
  */
 extension MySequencePublisher {
     func sink(
@@ -281,7 +307,7 @@ extension MySequencePublisher: Sinkable {
  will receive values and termination.  The predecessor type,
  _must_ be sinkable for reasons which will become obvious below.
  
- Here's our an implementation which takes care of points 1 and 2.
+ Here's an implementation which takes care of points 1 and 2.
  */
 struct MyMapPublisher<Predecessor: Sinkable, Published>{
     let predecessor: Predecessor
@@ -297,9 +323,10 @@ struct MyMapPublisher<Predecessor: Sinkable, Published>{
  correctly constrained generic parameters into place when you think about it.
  The main thing to note is that we are taking the output of the predecessor
  and tranforming it to our own output type. And because we are the
- `Map` publisher, we do exactly what all of the `map` functions we
- have encountered along the way always do. We live inside some
- generic type and transform the generic type into another type
+ `Map` publisher, we will do exactly what all of the other `map`
+ functions we have encountered along the way always do.
+ That is, the `map` function will live inside some
+ generic type and transform the generic type parameter into another type
  and then create a new generic type that is parameterized by the
  transformed type.  Hopefully you are starting to see yet again
  just how general the concept of `map` is.
@@ -388,7 +415,9 @@ extension MyMapPublisher: Sinkable {
  Watch closely.  :)
  */
 extension MySequencePublisher {
-    func map<T> (_ transform: @escaping (Published) -> T) -> MyMapPublisher<Self, T> {
+    func map<T> (
+        _ transform: @escaping (Published) -> T
+    ) -> MyMapPublisher<Self, T> {
         MyMapPublisher(self, transform: transform)
     }
 }
@@ -407,15 +436,7 @@ extension MySequencePublisher {
      publisher1
      let publisher2 = publisher1.map { $0 * 2 }
      publisher2
-     let cancellable1 = publisher2.sink { result2.append($0) }
-     cancellable1
 ```
- and of course, who could forget:
-```
-     let myPublisher1 = [1, 2, 3].myPublisher
-     let myCancellable1 = [1, 2, 3].myPublisher.sink { print("\($0)")
-```
- 
  Let's see what we get back from the following:
  */
 let myPublisher2 = myPublisher1.map { $0 * 2 }
