@@ -1,0 +1,8 @@
+/*: 
+ ## Algebraic Data Types
+*/
+
+/*:
+ ### Structs
+ 
+ */

@@ -98,7 +98,7 @@
       location = "group:25. Equatable Hashable and Comparable.playground">
    </FileRef>
    <FileRef
-      location = "group:26. Value and Reference Types.playground">
+      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/26. Algebraic Data Types.playground">
    </FileRef>
    <FileRef
       location = "group:27. Higher Order Functions I.playground">
@@ -123,5 +123,8 @@
    </FileRef>
    <FileRef
       location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/34. Combine V - Property Wrappers.playground">
+   </FileRef>
+   <FileRef
+      location = "group:35. App Architecture I - Principles.playground">
    </FileRef>
 </Workspace>

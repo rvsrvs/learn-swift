@@ -51,7 +51,7 @@ let f = [Int].myCompactMap
  compiler telling you what kind of object you are allowed to put
  into or extract from the `Array`. In Swift the situation is different.
  When you extend a generic, Swift generates a specific, unique class
- for that combination of types, i.e. [Int] is a unique class with our
+ for that combination of types, i.e. `[Int]` is a unique class with our
  unique function assigned to it's namespace. The
  creating-a-new-class-for-every-generic technique is called "reification",
  btw.
@@ -86,13 +86,8 @@ let f = [Int].myCompactMap
 ```
     ([Int]) -> (Int -> String?) -> [String]
 ```
- The common mistake that almost everyone makes is this: because you
- "know" that what this function does is take an `(Int -> String?)`
- and return an `[String]`, your mind just leaves out the leading
- `([Int]) ->`
- 
  This signature _should_ surprise you in several respects.
-At least three questions that should be in your mind are:
+ At least three questions that should be in your mind are:
  
  1. wtf? with the multiple `->`'s? and
  
@@ -112,6 +107,11 @@ At least three questions that should be in your mind are:
 ```
  Again, to emphasize, to correctly state the type of `f`, you have to
  say _all_ of that.
+ 
+ The common mistake that almost everyone makes is
+ this: because you "know" that what this function does is take
+ an `(Int -> String?)` and return an `[String]`, your mind just
+ leaves out the leading `([Int]) ->`.  So stop making that mistake!
  
  Eventually in Swift, you have to understand functions-which-take-functions AND
  functions-which-return-functions. Because every function that you
@@ -347,15 +347,14 @@ f3a
  of "enclosing" captured variables is, in fact, the reason
  that it is called a "closure".
  
- _This_ is what is meant by _functional composition_.
+ _This_ is what is meant by functional composition.
  We wrote a new function whose return value was the composition
  of it's input functions _and their environment at the time
  of composition_.
  
- The forms
- that composition can take are many and varied.  For now we are dealing
- with some simple ones, but if you are actually curious about how the
- Combine library works its magic,
+ The forms that composition can take are many and varied.
+ For now we are dealing with some simple ones,
+ but if you are actually curious about how the Combine library works its magic,
  the best statement of what its doing is that Combine consists
  of functions to compose functions which compose functions.
  (It can all get a bit self-rerential after a while).
@@ -427,7 +426,7 @@ extension StructA {
 type(of: StructA.staticAppend)
 type(of: StructA.append)
 /*:
- And, if we look at calling static append, the call and the result
+ And, if we look at calling `staticAppend`, the call and the result
  look _exactly_ like the call to `s1` and `s2` above.
 
  In fact, if you look at those two type signatures, you'll find that
@@ -715,5 +714,6 @@ func leftright(_ val: Int) -> String { right(left(val)) }
  3. how type erasure works
  4. how Swift uses these techniques in it's OO notation form
  
- And now... we are ready to talk about more what Combine does.
+ And now... we are ready to talk about more about how Combine does
+ what it does.
  */

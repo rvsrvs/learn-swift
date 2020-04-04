@@ -10,9 +10,12 @@
  It has been my experience when teaching Swift
  that this is the single hardest concept for students to grasp.
  Because of that, I recommend that you look closely at every
- line of code in this and the next playground, making sure that you understand
- what it is doing before proceeding. The material involved builds up at every step
- and you'll need to keep in mind several new things in order to follow the flow.
+ line of code in this and the other Higher Order Function
+ playgrounds, making sure that you understand
+ what each line of code is doing before proceeding.
+ The material involved builds up at every step
+ and you'll need to keep in mind several new things in order to
+ follow the flow.
  
  People always start a discussion of higher order functions
  with the family of functions which operate
@@ -20,15 +23,18 @@
  as well, but be prepared to move beyond them quickly.
  
  You should keep in mind that this playground
- is only half the story because the functions
+ is only part of the story because the functions
  we are studying here are those
  functions which accept a function as an argument and return a struct,
- class or enum type.
- (In the case of Sequence the type returned is an Array)
+ class or enum type. (In the case of Sequence the type returned is an Array)
  The true power of higher order functions only comes into focus in the
- next playground when we write functions that not only accept a single
- function as an argument, but which take _multiple_ functions as arguments,
- compose the arguments together somehow and return a function as a result.
+ subsequent playgrounds when we write functions that not only accept a single
+ function as an argument, but which:
+ 
+ * take _multiple_ functions as arguments,
+ * compose the arguments together somehow and
+ * return a function as a result
+ 
  These patterns of function composition are critical to absorb to be able to even
  read idiomatic Swift, much less write it.
  
@@ -42,8 +48,8 @@ func f(_ value: Int, _ g: (Int) -> Double) -> String { "\(g(value))" }
 type(of: f)
 /*:
  Note that f takes _TWO_ arguments.  The first is internally named `value` and the
- second is internally named `g`. Note that `value` is of type Int, and that `g` is of type:
- `function taking Int returning Double`.
+ second is internally named `g`. Note that `value` is of type `Int`, and that
+ `g` is of type: `function taking Int returning Double`.
  
  It is _VERY_ important that you understand that last sentence. `f` and `g` are NOT
  simply of type `function`.  There is no type that is just `function`.
@@ -53,7 +59,7 @@ type(of: f)
  
  in pseudo-code:
  
- `(([LIST OF ARGUMENT TYPES]) -> [RETURN_TYPE]`).Type
+ `([LIST OF ARGUMENT TYPES]) -> [RETURN_TYPE]`
  
  The latter is what you will see in the right hand column of the playground when
  we ask for `type(of: someFunction)`.
@@ -63,7 +69,7 @@ type(of: f)
  give you error messages anywhere you try to substitute a function which does
  not have the correct type.
  
- If you look closely at the `type(of:)` call for f, you will see that its type is
+ If you look closely at the `type(of:)` call for `f`, you will see that its type is
  precisely what I have specified.  So lets play with `f` a bit. Let's start
  by showing the various ways it can be called.  So let's make some funcs to use
  as `g`'s.
@@ -72,8 +78,8 @@ func g(_ i: Int) -> Double { Double(i) }
 var j = 12
 let h = { (i: Int) -> Double in Double(j * i) }
 /*:
- I've intentionally chosen awful names here to demonstrate that the names of the functions
- really don't matter to the type system.
+ I've intentionally chosen awful names here to demonstrate that the
+ names of the functions really don't matter to the type system.
  
  I've also intentionally done several things to illustrate the various syntactic
  forms that functions take underneath the covers of Swift.  Be aware that to the
@@ -120,8 +126,8 @@ f(4) { Double($0) }   // pass the 2nd variable in trailing closure syntax
  
  ### Sequences and especially Array
  
- This function taking a function concept
- turns out to be incredibly useful when dealing with Sequence types like Array.
+ This function-taking-a-function concept
+ turns out to be incredibly useful when dealing with `Sequence` types like `Array`.
  It is so useful in fact that this technique completely displaces what you have
  used for-loops to do in other languages.  Note that for-loops still exist in Swift,
  but their use is never required.  If you use them, you are essentially rewriting
@@ -129,7 +135,7 @@ f(4) { Double($0) }   // pass the 2nd variable in trailing closure syntax
  
  The reason that it can do this is likely something you may never have considered: every
  for-loop that you have ever written actually follows one of a handful of patterns.
- Higher order functions on Sequence implement precisely these patterns so
+ Higher order functions on `Sequence` implement precisely these patterns so
  that you don't have to write the boiler plate for the pattern yourself anymore.
  The best way to think of higher order functions on Sequence is that they are each
  a specialization of a for-loop with pre-packaged boilerplate for you to use.
@@ -163,7 +169,7 @@ f(4) { Double($0) }   // pass the 2nd variable in trailing closure syntax
 ```
  
  i.e. map implements a for-loop which calls the transform function on each
- element of the Sequence, _no matter what kind of Sequence it is_!
+ element of the `Sequence`, _no matter what kind of Sequence it is_!
  ALL of the Sequence higher order functions work this way.
  
  As an aside, if find yourself having a performance
@@ -188,7 +194,8 @@ f(4) { Double($0) }   // pass the 2nd variable in trailing closure syntax
     zip
     flatMap
  
- Sequence-specific higher order functions. You need to know these to be fluent. We'll
+ You need to know the following `Sequence`-specific higher order functions
+ in order to be fluent. We'll
  play with some of them below, but you should review the documentation for any whose
  function is not clear from their name.
  
@@ -209,7 +216,7 @@ f(4) { Double($0) }   // pass the 2nd variable in trailing closure syntax
  For completeness we include the `forEach` which behaves as the for-loop you are familiar
  with, only it doesn't allow `break` or `continue`.
  You should never need this unless you are dealing
- with old-style imperative code that incorporates Void-returning functions.
+ with old-style imperative code that incorporates `Void`-returning functions.
  
     forEach
 
@@ -260,16 +267,18 @@ type(of: x1)
  Essentially every generic type `G<A>` can be converted to a `G<B>` in this manner,
  to the point that it is difficult to imagine a generic which would _not_ have a map
  function.  In fact, we will verify this below by demonstrating exactly how this
- works with the Optional type. (Recall that Optional is a generic enum of two cases).
+ works with the `Optional` type. (Recall that `Optional` is a generic enum of two
+ cases).
 
- Here's another example this time turning [Int] to [String].
+ Here's another example this time turning `[Int]` to `[String]`.
  */
 let x2 = [1, 2, 3].map { "\($0)" }
 x2
 type(of: x2)
 /*:
- Note how we go back and forth between using the parens form and the trailing closure
- syntax form.  You need to master doing this as well.
+ Note how we go back and forth between using the parens syntax form
+ and the trailing closure syntax form.  You need to master doing this
+ as well.
  
  ### Zip
  
@@ -283,16 +292,17 @@ type(of: x2)
 
  In words, zip transforms a tuple of arrays into an array of tuples. Like `map`,
  `zip` is an amazingly general form that applies to almost any generic you will
- encounter, i.e. you can write a function with this signature for almost any generic G:
+ encounter, i.e. you can write a function with this signature for almost any
+ generic G:
  
      (G<A>, G<B>) -> G<(A, B)>
  
- Again, we'll do this below for Optional but for now, we'll show how it works with Sequence.
+ Again, we'll do this below for `Optional` but for now, we'll show how it works with Sequence.
  
  `zip` is a top level function that takes a tuple of sequences and returns a
  single sequence of tuples.  In the case of Sequence it does it in a lazy manner,
- so to we need to force the returned zip sequence into an array in order to see it easily.
- (Thats what the `Array(...)` is doing in the example).
+ so to we need to force the returned zip sequence into an array in order to see
+ it easily. (Thats what the `Array(...)` is doing in the example).
 */
 let z0 = Array(zip([1, 2, 3], ["a", "b", "c", "d"]))
 z0
@@ -301,8 +311,9 @@ type(of: z0)
  Note that we do in fact have a fully realized `Array<(Int, String)>` and that further
  this array only has 3 elements.  The fourth element in the second array could not be
  matched up with an element in the first array and was therefore dropped.  To do otherwise
- we would have had to make use of Optional on either Int or String and this would have
- violated the type signature of zip.  You can certainly write a zip which pads either side,
+ we would have had to make use of `Optional` on either `Int` or `String`
+ and this would have violated the type signature of zip.
+ You can certainly write a zip which pads either side,
  but the std library does not include it.
  
  ### FlatMap
@@ -312,22 +323,19 @@ type(of: z0)
 
     Array<A>: func flatMap<B>((A) -> Array<B> ) -> Array<B>
 
- `flatMap` on Sequence allows us to unnest one Sequence from another.
+ `flatMap` on `Sequence` allows us to unnest one `Sequence` from another.
  In this case I have [[Int]] and I want to turn it into an [Int].  If you think
  about it, like zip, you'll see that there's really only one way to implement
  this type signature.
  
  Side-note.  From here on out, you will notice that the code we write is
- largely driven
- by the type signatures.  Everything in this higher-order land we're
- exploring is about
+ largely driven by the type signatures.  Everything in this higher-order
+ land we're exploring is about
  looking at a type signature and thinking about what we can do with
- it and what patterns
- it adheres to.  More on this below.
+ it and what patterns it adheres to.  More on this below.
  
- `flatMap` on Sequence does this by simply appending each nested
- structure to a new structure
- of the same type.
+ `flatMap` on `Sequence` does this by simply appending each nested
+ structure to a new structurec of the same type.
  */
 let fm0 = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 type(of: fm0)
@@ -335,11 +343,11 @@ let fm1 = fm0.flatMap { $0 }
 fm1
 type(of: fm1)
 /*:
- Notice that we have gone from [[Int]] to [Int] and that all of the inner array
+ Notice that we have gone from `[[Int]]` to `[Int]` and that all of the inner array
  values have been preserved.  Again there is only one way to do this with an
  array and a function of this type signature.  Nothing else really makes sense.
  
- We can of course repeat the trick turning our [[Int]] into [String]
+ We can of course repeat the trick turning our `[[Int]]` into `[String]`
  */
 let fm2 = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 type(of: fm2)
@@ -347,13 +355,13 @@ let fm3 = fm0.flatMap { "\($0)" }
 fm3
 type(of: fm3)
 /*:
- I'm going to bet the results of that were not what you expected to see  :) Let's explain.
+ I'm going to bet the results of that were not what you expected to
+ see  :) Let's explain.
  
  Inside the `flatMap` we turned each `[Int]` into a `String`. So `[1, 2, 3]`
- became `"[1, 2, 3]"`, i.e. the String representation of the entire array.
- Interestingly, `String`
- conforms to the `Sequence` protocol, i.e. it is a `Sequence` of `Character`s.  Let's
- demonstrate what flatMap does to that.
+ became `"[1, 2, 3]"`, i.e. the `String` representation of the entire array.
+ Interestingly, `String` conforms to the `Sequence` protocol, i.e. it is a
+ `Sequence` of `Character`s.  Let's demonstrate what flatMap does to that.
  */
 let s = "abc, 123, baby you and me"
 let aOfs = s.flatMap { $0 }
@@ -376,18 +384,19 @@ type(of: fm4a)
  Note the nesting of map within map that we had to do to make the individual
  translations from (Int) -> String.  You need to understand this pattern.
  
- You may ask: how many times do I have an Array<Array<A>> as my given type after all?
+ You may ask: how many times do I have an `Array<Array<A>>` as my given type after all?
  That's really the wrong question.  What we're dealing with here is Sequences of which
  Array is only a particular type.  A better question is "under what circumstances am
- I likely to be dealing with a subsequence of a given sequence"?  Or: "when am I likely
- to have have to run a query against some back end that provides me as its return type
- the values I need to run a sequence of other queries?"  Or: "when will I be walking
+ I likely to be dealing with a subsequence of a given sequence"?  Or:
+ "when am I likely to have have to run a query against some back end that
+ provides me as its return type the values I need to run a sequence of other
+ queries?"  Or: "when will I be walking
  an array and calling a function that returns an Array on each element"
  _THOSE_ situations are when flatMap on Sequence really begins to show its power.
  
  ### Chaining
  
- All of the higher order functions on Sequence return an Array, which is itself
+ All of the higher order functions on `Sequence` return an `Array`, which is itself
  a Sequence, so all of these functions can be chained together.  Below we walk
  through various transformations using chaining on Array.  It is important that
  you understand that  much of Sequence handling is in fact chaining of
@@ -465,14 +474,19 @@ m1
 /*:
  As we go through we'll highlight each transformation with it's type signature.
  
- CompactMap acts for example on an array of optional A to produce an array of non-optional B.  We're getting an `Optional` here because we want only those elements of
- `d` which are Array<IntDescribable>, any element which does not meet that type
- will return nil.  So we are first `map`ping (Describable) -> [IntDescribable?] and
+ CompactMap acts for example on an array of `Optional<A>` to produce an array of
+ non-optional B.  We're getting an `Optional` here because we want only those
+ elements of `d` which are Array<IntDescribable>, any element which does
+ not meet that typevwill return nil.  So we are first
+ `map`ping `(Describable) -> [IntDescribable?]` and
  `compact`ing by removing `.none`.  Note by the way that I refer to this as `.none`
  rather than `nil`.  This is not strictly necessary, but is a really good habit
  that you will want to get into for a number of reasons, primarily that it makes
  you _think_ about the type of `Optional` you have on hand rather than mentally
  eliding the generic parameter.
+ 
+ Below are examples of various higher order functions on `Sequence`
+ with their action illustrated by type signatures.
  
  ### CompactMap - [A?] -> [B]
  */
@@ -561,9 +575,10 @@ m11
        Array<A>: func map <B>(_ f: (A) -> B) ->    Array<B> // Array
     Optional<A>: func map <B>(_ f: (A) -> B) -> Optional<B> // Optional
  
- Does the similarity stick out?   For basically ANY generic `G` (say `Array` or `Optional` since we are most familiar with those), parameterized by a type
- `A`, you can use `map` to turn that `G<A>` into a `G<B>`.
- When we get to Combine, we'll observe
+ Does the similarity stick out?   For basically ANY generic `G`
+ (say, `Array` or `Optional` since we are most familiar with those),
+ parameterized by a type `A`, you can use `map` to turn that `G<A>`
+ into a `G<B>`. When we get to Combine, we'll observe
  exactly the same pattern on a broader variety of generic types, btw.
  
  So let's do that with Optional.
@@ -575,18 +590,17 @@ let o2 = o1.map { "\($0)" }
 o2
 type(of: o2)
 /*:
- Sure enough, Optional has `map` already defined on it in the std lib.  And it
- behaves in many ways like guard-let and if-let.  In fact Optional.map can frequently
- be a much more compact way of accomplishing the same thing that guard-let or if-let
- accomplish with a lot less typing.  To be fluent in Swift, you really
- need to understand
- this.
+ Sure enough, `Optional` has `map` already defined on it in the
+ Swift standard library.  And it
+ behaves in many ways like guard-let and if-let.  In fact `Optional.map`
+ can frequently be a much more compact way of accomplishing the same
+ thing that guard-let or if-let accomplish with a lot less typing.
+ To be fluent in Swift, you really need to understand this.
  
- The standard library doesn't include a zip for Optional, so let's
+ The standard library doesn't include a `zip` for `Optional`, so let's
  write one using the
- form we gave above. (I'm spelling out Optional to make it more clear).
- There's not much
- choice in how we write this:
+ form we gave above. (I'm spelling out `Optional` to make it more clear).
+ There's really not much choice in how we write this given its signature:
  */
 func zip<A, B>(_ a: Optional<A>, _ b: Optional<B>) -> Optional<(A, B)> {
     guard let a = a, let b = b else { return Optional<(A, B)>.none }
@@ -640,7 +654,7 @@ type(of: o6)
 /*:
  Ruh-roh, Rorge. What the heck is this `Optional<Optional<Int>>` type for `o6`?
  Well it's what you get from the definition of map if `A` is `Int` and `B` is
- `Optional<Int>`. So lets look at something similar we had on Array.
+ `Optional<Int>`. So lets look at something similar to what we had on Array.
  Remember the signature of `flatMap` on `Array<A>` looks like this:
  
      func flatMap<B>((A) -> Array<B> ) -> Array<B>

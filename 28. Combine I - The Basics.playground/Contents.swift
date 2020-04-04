@@ -113,7 +113,8 @@ r1
  
  See all those `map` statements? What each one actually does is
  to `compose` a function by combining a) the closure argument attached
- to it with b) a function presented to it by its downstream successor Publisher.
+ to it with b) a function presented to it by its downstream successor
+ Publisher (or Subscriber for the Publisher on the end of the chain).
  It then presents the function it composed upstream to its predecessor.
  At the top of the chain publishing a new value simply consists of
  calling the function you received from your immediate neighbor downstream.
@@ -273,7 +274,7 @@ r2
 /*:
  ### Function Composition and Capture Semantics
  
- The key concept to to really understand about
+ The key concept to really understand about
  what's happening here is this:  As soon as
  we attach the subscriber, the functional composition happens and all the the pieces
  below we used to build up our chain disappear from our sight forever.
@@ -286,8 +287,7 @@ r2
  is presented with a function which implements the chain and an
  AnyCancellable is constructed.  All of the functions that we used
  to build up the chain are captured into that single function where we
- can never see them again. If you need to review that, go back to the previous
- playground (Higher Order Functions 2) and look for the word capture.
+ can never see them again.
  
  This means it is pretty important that you understand the capture
  semantics for closures.  Because every time you attach a Subscriber
@@ -362,8 +362,7 @@ enum Foo { }
  So you can probably guess what we do now.  Yeah, we start sending the values
  in one at a time.  Note the value of r3 after each send.
  Also note that the thing which responds to `send` is the `PassThroughSubject`, not
- any of the intervening `Publisher`s.  That's why we had to keep the subject in
- a separate variable, so that we could later call `send` on it.
+ any of the intervening `Publisher`s.
  */
 r3
 sub1.send(1)
@@ -413,13 +412,13 @@ So if you go and look at the Apple doc on PassThroughSubject,
  out it comes the other end of the chain.
  
  Btw, if you are familiar with UIKit programming, this will remind you of something.
- It's a lot like a NotificationCenter, only everything that goes through it is
+ It's a lot like a `NotificationCenter`, only everything that goes through it is
  explicitly typed and you can do this chaining action on things _before_ you
  receive the notification.
  
- Among other things, Combine replaces NSNotification and NSNotificationCenter with
+ Among other things, Combine replaces `Notification` and `NotificationCenter` with
  a much more flexible mechanism which can garbage collect far more readily and which
- does not steer you into using one gigantic singleton of NotificationCenter.
+ does not steer you into using one gigantic singleton of a `NotificationCenter`.
  
  One more important thing to note about PassThroughSubject that lets
  you know it still has one foot in the imperative
@@ -456,9 +455,15 @@ let c4 = sub2
 sub2.send(1)
 sub2.send(2)
 sub2.send(3)
-
 /*:
- Now... Lets cancel the second chain.
+ Now, let's see what's in `r4` and `r5`.
+ */
+r4
+r5
+/*:
+ Looks like what we'd expect.
+ 
+ Now... Lets cancel the second chain, but then we'll send another value down the PassThroughSubject.
  */
 c4.cancel()
 sub2.send(4)
@@ -469,21 +474,25 @@ r4
 r5
 /*:
  If you expected r4 to have 4 values and r5 to have only 3, you got it right.
+ Cancellation therefore can be seen to be something associated with subscription
+ and _not_ with publication.  In cases where pubs are 1:1 with subs, these can
+ be confused, so you need to think carefully about this.  (We'll see more
+ on it later when we deal with Timers).
 
  ### Conclusion
  
- Let's make explicit some things that should be jumping out at you at
- this point, but that we have not discussed:
+ Let's make explicit some things that should be already be jumping out at you at
+ this point:
  
- 1. Sequence and Publisher have almost _exactly_ the same set of methods
+ 1. `Sequence` and `Publisher` have almost _exactly_ the same set of methods
  defined on them.  For every higher order function that you are used to
- working with on Sequence, you expect to find the exact same function
+ working with on `Sequence`, you expect to find the exact same function
  defined on Publisher.  This is not coincidental.  They both model
  the common notion of "sequence", one synchronously, one asynchronously.
- 2. The only cases where Sequence and Publisher differ in their method
+ 2. The only cases where `Sequence` and `Publisher` differ in their method
  signature are places that are clearly related to things being synchronous
  vs asynchronous.  For example `Publisher` doesn't have a `makeIterator` function
- and Sequence doesn't have a `collect(byTime:)` function.
+ and `Sequence` doesn't have a `collect(byTime:)` function.
  3. Combine does to "callback" functions precisely what the higher-order
  functions on `Array` do to for-loops, it takes away all the boilerplate
  and gives you specializations of callbacks in the form of higher-order
