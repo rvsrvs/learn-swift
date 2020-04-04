@@ -588,9 +588,10 @@ r2
  2. We have implemented only the very simplest form of Publishers,
     the ones for `Array` and `map`.  Everything else is more complex.
  3. We have completely ignored error handling
- 4. We haven't explained those other really important fundamental
+ 4. We have done absolutely nothing with Cancellable
+ 5. We haven't explained those other really important fundamental
     elements of generics: `zip`, `reduce`, and `flatMap` at all.
- 5. Everything here is synchronous and the whole point of Combine
+ 6. Everything here is synchronous and the whole point of Combine
     is really _asynchrony_.
  
  But we've made a start and in subsequent playgrounds we'll
