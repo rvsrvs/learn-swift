@@ -98,33 +98,33 @@
       location = "group:25. Equatable Hashable and Comparable.playground">
    </FileRef>
    <FileRef
-      location = "group:26. Algebraic Data Types.playground">
+      location = "container:26. Algebraic Data Types.playground">
    </FileRef>
    <FileRef
-      location = "group:27. Higher Order Functions I.playground">
+      location = "container:27. Higher Order Functions I.playground">
    </FileRef>
    <FileRef
-      location = "group:28. Combine I - The Basics.playground">
+      location = "container:28. Combine I - The Basics.playground">
    </FileRef>
    <FileRef
-      location = "group:29. Higher Order Functions II.playground">
+      location = "container:29. Higher Order Functions II.playground">
    </FileRef>
    <FileRef
-      location = "group:30. Higher Order Functions III.playground">
+      location = "container:30. Higher Order Functions III.playground">
    </FileRef>
    <FileRef
-      location = "group:31. Combine II - Error Handling.playground">
+      location = "container:31. Combine II - Error Handling.playground">
    </FileRef>
    <FileRef
-      location = "group:32. Combine III - Networking.playground">
+      location = "container:32. Combine III - Networking.playground">
    </FileRef>
    <FileRef
-      location = "group:33. Combine IV - Timers.playground">
+      location = "container:33. Combine IV - Timers.playground">
    </FileRef>
    <FileRef
-      location = "group:34. Combine V - Property Wrappers.playground">
+      location = "container:34. Combine V - Property Wrappers.playground">
    </FileRef>
    <FileRef
-      location = "group:35. App Architecture I - Principles.playground">
+      location = "container:35. App Architecture I - Principles.playground">
    </FileRef>
 </Workspace>

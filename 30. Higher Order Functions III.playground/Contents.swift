@@ -141,17 +141,17 @@ publisher2
      let publisher1 = [1, 2, 3].publisher // return Publishers.Sequence
  
  The Publisher being used, i.e. `Publishers.Sequence`,  has an initializer
- which accepts a closure. On the invocation of
+ which accepts an array. On the invocation of
  `.publisher`, [1, 2, 3] instantiates a Publishers.Sequence using the
- closure-accepting init.
+ array-accepting init.
  
  ### Doing our own mini Combine
  
- If we ignore the Publisher protocol and demand/backpressure features
- of Combine to simplify things a bit, we can imagine that
- the `Array` publisher is implemented as something like
- the following (we can't be sure of course since Combine
- is closed-source).
+ If we ignore the demand/backpressure and most of the
+ error handling features of Combine to simplify things a bit,
+ we can imagine that the `Array` publisher is implemented
+ as something like the following (we can't be sure of course
+ since Combine is closed-source).
  
  First, there's an enum
  that represents the termination of the sequence, either
@@ -199,6 +199,7 @@ extension MySequencePublisher {
  Note that this publisher, simply takes the elements of the array one at a
  time, publishes them with the `value` closure and then when it's gotten to
  the end of the array, it sends the `.complete` via the `termination` closure.
+ Then it returns a MyCancellable, which for now we have left unimplemented.
  
  If you don't understand this, you should study it, it's important because
  we are going to compose that function with other functions.  A lot.
@@ -230,7 +231,7 @@ let myCancellable1 = myPublisher1.sink { print("\($0)") }
  invoke `sink`, `myPublisher` returns a `MySequencePublisher` instance
  which we assign to `myPublisher1`. `myCancellable` for this
  particular publisher isn't really cancellable, but this is
- what we saw in Combine I as well.
+ what we saw in the "Combine I" playground as well.
  
  ### Transforming Publishers
  
@@ -332,11 +333,11 @@ struct MyMapPublisher<Predecessor: Sinkable, Published>{
 }
 /*:
  Ok, so 1 and 2 weren't so hard.  `MyMapPublisher` just needed to get the
- correctly constrained generic parameters into place when you think about it.
+ correctly constrained generic parameters into place.
  That is, it needed to know what type of thing it's predecessor was
- and what type of value it would publish.  And we have to make those
- types generic, so that we can work with any Sinkable and any Published
- type.
+ and what type of value it would publish into its sink functions.
+ And we have to make those types generic, so that we can work with any
+ Sinkable and any Published type.
  
  The main thing to note is that we are taking the output of the predecessor
  and tranforming it to our own output type.  _Every_ transforming publisher
@@ -476,8 +477,29 @@ extension MySequencePublisher {
  Let's see what we get back from the following:
  */
 let myPublisher2 = myPublisher1.map { $0 * 2 }
-myPublisher2
-
+print(type(of: myPublisher2))
+/*:
+ This is one of the most revealing lines in the entire playground.
+ Read the type of `myPublisher2` in the output below very
+ carefully.  Here it is printed for you:
+ ```
+ MyMapPublisher<MySequencePublisher<Int, Never>, Int>
+ ```
+ What this tells us is that myPublisher2 has a MySequencePublisher
+ wrapped up inside it.  Remember that the `map` function creates
+ a `MyMapPublisher` and the `init` for that type accepts the
+ predecessor as an argument which is then stored in the `init`'d
+ value.  Whenever we create these transforming publishers
+ we end up with nested predecessors, right back up to the top
+ of the chain.
+ 
+ Now, we don't have to keep those around, we can use some
+ type erasure techniques here, and that's what Combine does
+ btw.  But I find it very useful teaching purposes to keep
+ them around to help you visualize what's going on.
+ 
+ Let's print the new values that we get from our new publisher.
+ */
 print("=========== New output =============")
 
 let myCancellable2 = myPublisher2.sink { print("\($0)") }
@@ -492,7 +514,8 @@ let myCancellable2 = myPublisher2.sink { print("\($0)") }
  chaining of all kinds of transforming publishers. (Actually on all publishers
  but for now we'll defer making it general across our originating publisher).
  In the example we're working through here,
- we need to get `MyMapPublisher` to implement `map` as well so that we can chain
+ we need to get `MyMapPublisher` to implement `map` as
+ well so that we can chain
  additional `map` calls onto it.
  So, let's do that, but let's do it the easy way.
  We'll start by declaring a `MyPublisher` protocol that has the `map`
@@ -568,6 +591,24 @@ r2
  you might want to remove the implementation of `map` on `MySequencePublisher`
  and just make `MySequencePublisher` conform to `MyPublisher`, but I'm going
  to stop there and make some observations.
+ 
+ Let's do one more thing to sort of give you an idea of what's going on here.
+ */
+let myPublisher3 = [1, 2, 3]
+    .myPublisher
+    .map { $0 * 2 }
+    .map { Double($0) }
+    .map { "\($0)" }
+print(type(of: myPublisher3))
+/*:
+ If you look at the type of `myPublisher3` I think it's very
+ revealing.  You get a real feel for what we have composed in this
+ very simple way.  It's this complex set of nested structures
+ each of which relate to the one before and behind them in the
+ chain in a very specific way - their input has to match their
+ predecessors output.  This is the key to understanding the error
+ messages that you will invariably get from Combine.  You _must_
+ make the input of a publisher match the output of its predecessor.
  
  ### Relationship to Combine
  
