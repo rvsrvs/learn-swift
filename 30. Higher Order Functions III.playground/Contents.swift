@@ -86,7 +86,7 @@ import Combine
  ```
  
  Pretty clearly that's not a structure we want to have to maintain.
- For example, what if I want do one thing on a single tap with two
+ For example, what if I want to do one thing on a single tap with two
  fingers at some points in my app and something else at other
  points?  In that case,
  I have to replace that entire piece of code. So what
@@ -105,9 +105,9 @@ import Combine
  2. doesn't compose well, and
  3. contains a lot things that look like boilerplate
  
- sounds very reminiscent of what we saw with
+ This all sounds very reminiscent of what we saw with
  for-loops and the higher order functions on `Sequence`.
- Unsurprisingly it turns out that that we can apply the same
+ Unsurprisingly, it turns out that that we can apply the same
  ideas to callbacks that we applied to for-loops.
  In the case of for-loops, we made higher order functions
  that used for-loops underneath and for callbacks, we'll make
@@ -115,7 +115,7 @@ import Combine
  
  ### Generateing function-returning-functions
  
- Let's look at our
+ Let's look again at our
  simplest example from the Combine I playground and see
  if we can't write something like Combine for ourselves.
  Here it is as a reminder:
@@ -128,7 +128,7 @@ import Combine
      .sink { r2.append($0) }
  ```
  
- Let's look again at a subset of our simple Combine example
+ Now let's further look at a subset of that
  (I've pulled the publishers apart for explication):
  */
 var result2 = [Int]()
@@ -143,8 +143,8 @@ publisher2
      let publisher1 = [1, 2, 3].publisher // return Publishers.Sequence
  
  The Publisher being used, i.e. `Publishers.Sequence`,  has an initializer
- which accepts an array. On the invocation of
- `.publisher`, [1, 2, 3] instantiates a Publishers.Sequence using the
+ which accepts an array. So on the invocation of
+ `.publisher`, the array [1, 2, 3] instantiates a Publishers.Sequence using the
  array-accepting init.
  
  ### Doing our own mini Combine
@@ -215,11 +215,13 @@ extension MySequencePublisher {
  a MyCancellable.  We can see in this implemenation why MyCancellable
  was left unimplemented - because by the
  time we could do anything with it, the publisher will have terminated
- any way...
- Note that, we provide a default for termination which doesn't do anything.
- This just lets us ignore it for now.
+ anyway.
+ Note that we provide a default for a termination closure
+ which doesn't do anything. This just lets us ignore it for now and
+ focus on the `value` function.
  
- If you don't understand the above, you should study it, it's important because
+ If you don't understand the above, you should
+ pause here and study it. It's important to understand because
  we are going to compose that function with other functions.  A lot.
  
  In this example, `termination` and `value` are our _callbacks_. All that
@@ -282,11 +284,11 @@ protocol Sinkable {
     ) -> MyCancellable
 }
 /*:
- Now we need to make MySequencePublisher conform to that
+ Now we need to make `MySequencePublisher` conform to that
  protocol.  That's pretty easy since it already does,
  we just associate the generic types with the associatedtypes
  via a typealias and we are done.
- (You may want to review Playground 22 if how
+ (You may want to review Playground 22 if they way in which
  associatedtypes and typealiases work together is not clear).
  */
 extension MySequencePublisher: Sinkable {
@@ -332,7 +334,7 @@ extension MySequencePublisher: Sinkable {
  it _must_ have a predecessor.
  
  The predecessor is the "upstream" object from which this publisher
- will receive values and termination.  The predecessor type,
+ will receive values and termination.  The predecessor type
  _must_ be sinkable for reasons which will become obvious below.
  
  Here's an implementation which takes care of points 1 and 2.
@@ -357,7 +359,8 @@ struct MyMapPublisher<Predecessor: Sinkable, Published>{
  And we have to make those types generic, so that we can work with any
  Sinkable and any Published type.
  
- The main thing to note is that we are taking the output of the predecessor
+ The main thing to note is that when our `value` function is invoked,
+ we are taking the output of the predecessor
  and tranforming it to our own output type.  _Every_ transforming publisher
  will do precisely this.  These publishers come in a handful of forms,
  most of which correspond to one of the higher order functions we looked
@@ -457,14 +460,14 @@ extension MyMapPublisher: Sinkable {
  want to study it until you do.
  
  Note that because we have separated the `compose` function out to its
- own function, the `sink` function is in fact, extremely general. We
+ own function, the `sink` function is extremely general. We
  could in fact move this implementation to a protocol extension of
  `Sinkable` and not have to implement it on any type which conforms
  to `Sinkable`.  I won't here because then I'd need to change the
  code above and it would interrupt the flow of the playground. But
  you should be aware that that is precisely what Combine does in
  the Publisher protocol.  All of the generality that we are dealing
- with here, lives in protocol extensions.
+ with here lives in protocol extensions.
  
  It may be obvious but if you understand the line:
 ```
@@ -480,7 +483,20 @@ extension MyMapPublisher: Sinkable {
  captured when it was initialized.  The output of `compose`
  _must_ have the form of being a suitable `value` function for this
  publisher's predecessor.  The publisher then hands the `compose`d
- function to it's predecessor as the predecessor's own value function.
+ function to it's predecessor as the predecessor's own value function
+ and the entire process recurses.
+ 
+ Eventually this recursion of function composition reaches the top of
+ the chain and an originating publisher simply accepts the final
+ composed function as it's `value` function.  At that point all of the
+ intermediate functions have been incorporated into one giant
+ function, including the terminal closure attached to the original
+ `sink` function.  The ultimate signature of the final composed
+ function is `(Originating.Published) -> Void` with all of the
+ intermediate types erased.  This function in a sense, is all
+ that remains of the `Publisher` chain we created - all of the
+ intermediate state is simply composed into a unified whole when
+ the `sink` function is invoked.
  
  This step is absolutely at the heart of Combine.  Combine does
  what it does by recursively composing chains of `value` functions
@@ -533,8 +549,8 @@ print(type(of: myPublisher2))
  of the chain.
  
  Now, we don't have to keep those around, we can use some
- type erasure techniques here, and that's what Combine does
- btw.  But I find it very useful teaching purposes to keep
+ type erasure techniques here (and that's what Combine actually
+ does.)  But I find it very useful for teaching purposes to keep
  them around to help you visualize what's going on.
  
  Let's print the new values that we get from our new publisher.
@@ -583,6 +599,18 @@ extension MyPublisher {
     }
 }
 /*:
+ Lets do our exercise from "Higher Order Functions 1" and compare signatures of
+ map functions (I've changed the generic parameter names to match across all three).
+ ```
+       Array<A>: func map <B>(_ f: (A) -> B) ->          Array<             B> // Array
+    Optional<A>: func map <B>(_ f: (A) -> B) ->       Optional<             B> // Optional
+ MyPublisher<A>: func map <B>(_ f: (A) -> B) -> MyMapPublisher<Predecessor, B> // MyPublisher
+ ```
+ There's an extra parameter type on `MyMapPublisher` that has to do with the predcessor
+ but if we ignore that we see that that `map` on a `MyPublisher` does _exactly_
+ what you expect `map` to do on any generic type, it transforms the
+ generic type parameter.
+ 
  And now since `MyMapPublisher` already conforms to Sinkable, we can
  just tell it to conform to `MyPublisher` for free.
  */
@@ -606,9 +634,10 @@ extension MyMapPublisher: MyPublisher { }
  2. composing the downstream `sink` with its `transform` function and
  3. presenting the composition to it's upstream predecessor as its
     sink function.
- 
+
  i.e. the chain above is doing recursive functional composition from
  the bottom of the chain to the top, _but only when `sink` is invoked_.
+ And the recursion terminates at the top of the chain.
  
  Let's try it out with the code we just wrote.
  */
