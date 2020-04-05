@@ -2,8 +2,8 @@
  # Higher Order Functions II: Functions Returning Functions
  ### (aka Functional Composition or "There is no spoon")
  
-The point of this playground is to demonstrate Swift's capabilities to
- "reshape" functions - also known as functional composition.
+ The point of this playground is to demonstrate Swift’s capabilities to
+ “reshape” functions - also known as functional composition.
  
  This feature is generally what people are referring to when they
  speak of _functional programming_ - its use informs the entire style.
@@ -265,9 +265,8 @@ public func flip<A, B, C>(
     }
 }
 /*:
- This is our first real example of functional composition,
- i.e. using a function to change
- the "shape" of another function or functions.  To be clear, this
+ This is our first real example of massaging the shape of our
+ function to enable composition.  To be clear, this
  function takes a generic argument of function-returning-function type:
  
     (A) -> (C) -> B
