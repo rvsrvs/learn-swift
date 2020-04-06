@@ -10,7 +10,7 @@ import Combine
  on Sequence were really just wrappers around for-loops
  which abstracted away patterns of for-loop usage that you
  never knew existed?  Well it turns out that Combine does
- _precisely_ that same thing for _callbacks_.
+ precisely that same thing for _callbacks_.
  
  So what we're going to do in this playground is take the very first
  simple example of Combine that we experimented with in the
@@ -113,7 +113,7 @@ import Combine
  that used for-loops underneath and for callbacks, we'll make
  higher order functions that use callbacks underneath.
  
- ### Generateing function-returning-functions
+ ### Generating function-returning-functions
  
  Let's look again at our
  simplest example from the Combine I playground and see
@@ -288,8 +288,8 @@ protocol Sinkable {
  protocol.  That's pretty easy since it already does,
  we just associate the generic types with the associatedtypes
  via a typealias and we are done.
- (You may want to review Playground 22 if they way in which
- associatedtypes and typealiases work together is not clear).
+ (You may want to review Playground 22 if it's not clear to
+ you how associatedtypes and typealiases work together).
  */
 extension MySequencePublisher: Sinkable {
     typealias Sinking = Published
@@ -325,8 +325,9 @@ extension MySequencePublisher: Sinkable {
  While it is nowhere in Apple's documentation, I find
  it useful to think of Publishers as coming in two varieties -
  "Originating" and "Transforming".  Originating publishers sit at the
- top of a chain and create values that are passed down the chain.
- By definition, they can have no predecessor.  `MySequencePublisher`
+ top of a chain and they _create_ values that are passed down the chain.
+ By definition, they don't need a predecessor to hand them values
+ because they create values themselves.  `MySequencePublisher`
  in this playground is of the Originating type.  Transforming
  publishers on the other hand, cannot create new values out of
  thin air, they only act when they receive a value to transform.
