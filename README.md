@@ -38,6 +38,14 @@ All code is done in thoroughly commented playgrounds so you'll want to
 do the following in Xcode: `Editor->Show Raw Markup` whenever you open
 a playground.
 
+One final note: I _highly_ recommend reading or watching pretty much everything
+in the bibliography attached at bottom.  It is impossible in a single 
+work such as this to cover everything in the detail that it deserves, so I've
+incorporated pointers to things that I particularly liked and found helpful
+in the biobliography.  In particular, I cannot recommend the Pointfree.co
+video series highly enough.  I link below to their free content, but I pay 
+them for a subscription and I recommend doing the same to anyone serious
+about functional programming in Swift.
 
 ## Contributors
 
@@ -109,7 +117,7 @@ The community is converging on using the functional programming aspects of Swift
 * `var` properties in structs. By default your data structures should be immutable and mutability should only be used after due consideration and a driving performance requirement.  If you make your properties `let` by default, you will find that use of the mutating keyword in the previous point simply goes away on its own.
 
 ### ASPIRE NOT TO USE
-* trailing closure syntax if using Swift versions greater than 5.2.  With the introduction of the ability to use Keypaths in all places that closures can be used and the callAsFunction feature, many uses of inline closure declarations are no longer needed and can be replaced with a more `point-free` style.
+* trailing closure syntax if using Swift versions greater than 5.2.  With the introduction of the ability to use Keypaths in all places that closures can be used and the `callAsFunction` feature, many uses of inline closure declarations are no longer needed and can be replaced with a more "point-free" style.
 * `if` and `if-else` statements (prefer the use of ternary conditionals that return values instead),  If `switch` had a language-supported form which returned values in the way that ternary if's do, switch would join this list.
 * protocols (unless you are absolutely sure that there is only one way for each conforming concrete type to implement the protocol). Most application-level declarations of protocols do not meet this test and should use protocol witness structs instead. (you can thank me later). So, for example, Hashable and Equatable can be implemented only one way for any given type and are therefore good subjects for protocols.  CustomDebugStringConvertible frequently can be implemented in multiple ways for a given type and in those circumstances should be managed with a protocol witness rather than a conformance.  Think about this when you go to create a protocol type.
 
