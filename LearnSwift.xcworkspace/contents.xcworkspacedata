@@ -5,46 +5,46 @@
       location = "container:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/README.md">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/01a. The Basics.playground">
+      location = "group:01a. The Basics.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/01b. Type alliases.playground">
+      location = "group:01b. Type alliases.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/01c. Tuples.playground">
+      location = "group:01c. Tuples.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/01d. Optionals.playground">
+      location = "group:01d. Optionals.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/01e. Assertions.playground">
+      location = "group:01e. Assertions.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/02. Basic Operators.playground">
+      location = "group:02. Basic Operators.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/03. Strings and Characters.playground">
+      location = "group:03. Strings and Characters.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/04a. Arrays.playground">
+      location = "group:04a. Arrays.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/04b. Dictionaries.playground">
+      location = "group:04b. Dictionaries.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/05. Control Flow.playground">
+      location = "group:05. Control Flow.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/06. Functions.playground">
+      location = "group:06. Functions.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/07. Closures.playground">
+      location = "group:07. Closures.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/08. Enumerations.playground">
+      location = "group:08. Enumerations.playground">
    </FileRef>
    <FileRef
-      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/09. Classes and Structures.playground">
+      location = "group:09. Classes and Structures.playground">
    </FileRef>
    <FileRef
       location = "group:10. Properties.playground">
