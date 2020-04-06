@@ -29,12 +29,14 @@ laggards remaining, but much of the community still writes its code using
 the OO syntactic elements and is not yet fully up to speed with functional
 kernel.
 
-I believe that Swift 6 will probably represent the opportunity for the community
+I believe that Swift 6, Combine and SwiftUI will probably 
+trigger the community
 as a whole really begin leaving their OO code behind and making full use of
 the smaller syntactic core. The ultimate goal of this repository to move my 
-students in that direction.
+students in that direction and prepare them for the shift I see underway
+in the Swift community.
 
-All code is done in thoroughly commented playgrounds so you'll want to
+All code below is done in thoroughly commented playgrounds so you'll want to
 do the following in Xcode: `Editor->Show Raw Markup` whenever you open
 a playground.
 
