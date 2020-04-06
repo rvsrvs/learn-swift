@@ -3,6 +3,41 @@
 ```
 aka The Vanifesto
 ```
+This repo is an ongoing project designed to facilitate a 
+[course I teach in iOS development](https://www.summer.harvard.edu/course-catalog/courses/introduction-to-mobile-application-development-using-swift-and-ios/33540).
+
+The goal is to provide a broad reference to Swift language syntax for students new to
+the language and then focus in sharply on the 
+parts of the language that make use of functional programming techniques.
+
+It is my observation that Swift as a platform has two parts: 
+
+1. a relatively small kernel of syntax and 
+functionality that centers around Swift's powerful type system and 
+makes excellent use of contemporary functional programming patterns 
+and 
+2. a much larger set of syntax that exists to provide backwards compatibility to C,
+Objective C, and even Python and which makes use of standard single inheritance,
+pointer-based, object-oriented programming techniques.  
+
+Given the state of Apple's platform in 2010 when Swift
+development began, the backwards compatibility layer inescapably had to be developed
+and completed first and Apple had to engage in a lengthy and laborious process
+of converting programmers to the new platform.  As I write in early 2020, most of 
+the Apple development community has moved to the new platform with only a few
+laggards remaining, but much of the community still writes its code using
+the OO syntactic elements and is not yet fully up to speed with functional
+kernel.
+
+I believe that Swift 6 will probably represent the opportunity for the community
+as a whole really begin leaving their OO code behind and making full use of
+the smaller syntactic core. The ultimate goal of this repository to move my 
+students in that direction.
+
+All code is done in thoroughly commented playgrounds so you'll want to
+do the following in Xcode: `Editor->Show Raw Markup` whenever you open
+a playground.
+
 
 ## Contributors
 
@@ -24,16 +59,9 @@ Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
   You will need XCode 11.3 (or later) and a Mac to run it on.
 
-## Purpose & Goal
+# General Swift Recommendations
 
-  More than a primer, these playgrounds are intended to get programmers up to
-  speed on Swift as fast as possible so they can begin using Swift productively.
-
-  To increase your understanding, you are encouraged to experiment with them
-  along the way. Play the 'what-if' game. These are live playgrounds which offer
-  near-realtime feedback of edits.
-
-# Coding Guidelines
+## Coding Guidelines
 
 Be familiar with:
 
