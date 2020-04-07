@@ -35,8 +35,8 @@ kernel.
 
 I believe that Swift 6, Combine and SwiftUI will probably trigger the community
 as a whole to begin leaving its OO code behind and making full use of
-the smaller syntactic core. The ultimate goal of this repository to move my 
-students in that direction and prepare them for the shift I see underway
+the smaller syntactic core. The ultimate goal of this repository is to help my 
+students move in that direction and prepare them for the shift I see underway
 in the Swift community.
 
 *NB* All code below is in commented playgrounds using Apple's
@@ -285,6 +285,8 @@ You will want to:
 
 ## Algebraic Data Types
 
+* If you not familiar with ADTs as a theory, I highly recommend that you watch the Pointfree episode listed in
+the bibliography.
 * Void and Never
   * Be aware that Void is actually a meaningful type in Swift, specifically it is the structural type inhabited by only one value.  Incredibly, this has meaning and makes sense of a lot of other things once you really grasp it.  
   * Understand that Void's syntax is different than other types because the way it is expressed syntacticly, `()`, represents both the type and the value for Void and whether it is the type or value being referenced in any given situation is context-dependent.  
