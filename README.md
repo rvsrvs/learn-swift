@@ -1,8 +1,12 @@
+
 # learn-swift
-===========
+
 ```
 aka The Vanifesto
 ```
+
+===========
+
 This repo is an ongoing project designed to facilitate a 
 [course I teach in iOS development](https://www.summer.harvard.edu/course-catalog/courses/introduction-to-mobile-application-development-using-swift-and-ios/33540).
 
@@ -10,7 +14,7 @@ The goal is to provide a broad reference to Swift language syntax for students n
 the language and then focus in sharply on the 
 parts of the language that make use of functional programming techniques.
 
-It is my observation that Swift as a platform has two parts: 
+It is my observation that Swift as a language has two parts: 
 
 1. a relatively small kernel of syntax and 
 functionality that centers around Swift's powerful type system and 
@@ -29,14 +33,14 @@ laggards remaining, but much of the community still writes its code using
 the OO syntactic elements and is not yet fully up to speed with functional
 kernel.
 
-I believe that Swift 6, Combine and SwiftUI will probably 
-trigger the community
-as a whole really begin leaving their OO code behind and making full use of
+I believe that Swift 6, Combine and SwiftUI will probably trigger the community
+as a whole to begin leaving its OO code behind and making full use of
 the smaller syntactic core. The ultimate goal of this repository to move my 
 students in that direction and prepare them for the shift I see underway
 in the Swift community.
 
-All code below is done in thoroughly commented playgrounds so you'll want to
+*NB* All code below is in commented playgrounds using Apple's
+Markdown comment formatting specification. So you'll want to
 do the following in Xcode: `Editor->Show Raw Markup` whenever you open
 a playground.
 
@@ -69,7 +73,7 @@ Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
   You will need XCode 11.3 (or later) and a Mac to run it on.
 
-# General Swift Recommendations
+# An Opinionated Look at Swift
 
 ## Coding Guidelines
 
@@ -495,6 +499,7 @@ It’s not possible to write map because you can’t add the generic type which 
   * [SwiftUI and State Management: Part 3](https://www.pointfree.co/episodes/ep66-swiftui-and-state-management-part-3)
   * [The Combine Framework and Effects: Part 1](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-1)
   * [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
+  * [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
 * [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
 
 ### Generic Programming and Higher Kinded Types
@@ -509,7 +514,7 @@ It’s not possible to write map because you can’t add the generic type which 
 * The Monad and HKT explanation that finally made sense of things for me.
   * [Monoids to Monads](https://broomburgo.github.io/fun-ios/post/why-monads/)
 * Bow/Swift
-  * [Bow](https://bow-swift.io/docs/) is an attempt to introduce a complete set of Haskell-like HKT concepts into Swift.  I wouldn't use it bc I think it needs support in the language to be used by mortals (which seems to be coming based on the Generics Manifesto), but their documentation is an incredible tutorial on why Swift needs HKTs and how you would use them if it had them natively.
+  * [Bow](https://bow-swift.io/docs/) is an attempt to introduce a complete set of Haskell-like HKT concepts into Swift.  I wouldn't use it bc I think it needs support in the language to be used by mortals (which seems to be coming based on the Generics Manifesto), but the documentation is an incredibly helpful tutorial on why Swift needs HKTs and how you would use them if it had them natively.
   * In particular, you will want to look at their [documentation on emulating HKTs](https://bow-swift.io/docs/fp-concepts/higher-kinded-types/#emulating-hkts-in-bow)
 * Generic Associated Types
   * Are now in the [Generics Manifesto](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md#generic-associatedtypes)
@@ -535,15 +540,3 @@ It’s not possible to write map because you can’t add the generic type which 
 * [https://swiftwithmajid.com](https://swiftwithmajid.com)
 * [https://swiftui-lab.com](https://swiftui-lab.com)
 * [https://developer.apple.com/tutorials/swiftui/tutorials](https://developer.apple.com/tutorials/swiftui/tutorials)
-	
-
-
-
-
-
-
-
-
-
-
-

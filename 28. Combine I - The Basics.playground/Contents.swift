@@ -106,10 +106,11 @@ r1
  
  So where does functional composition come in?  The best way to
  understand it is to try and write a mini version of Combine yourself.
- This lets you gain a lot of intuition about why Combine does things
+ And a few playgrounds from now, we're going to do exactly that.
+ Writing your own lets you gain a lot of intuition about why Combine does things
  the way it does. While this is a great exercise and I recommend it to
  all who are serious about Swift programming, I'll go ahead and tell
- you the answer.
+ you the answer for now.
  
  See all those `map` statements? What each one actually does is
  to `compose` a function by combining a) the closure argument attached

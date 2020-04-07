@@ -472,19 +472,23 @@ extension MyMapPublisher: Sinkable {
  
  It may be obvious but if you understand the line:
 ```
- predecessor.sink(termination, compose(publish))
+ predecessor.sink(termination, compose(value))
 ```
  you are well on your way to understanding Combine.  So let's be very
  clear about what that line is doing.
  
- When you invoke `sink` on
+ (Remember that value here is not a "value" it's the name of a
+ function that accepts new values of the Published type of
+ this publiser)
+ 
+ So, when you invoke `sink` on
  a _transforming_ publisher, that publisher composes a function
- using a) the `value` it has been provided to publish values on and
+ using a) the `value` function it has been provided to publish values on and
  b) it's own internal state, in this case a `transform` function it
  captured when it was initialized.  The output of `compose`
  _must_ have the form of being a suitable `value` function for this
  publisher's predecessor.  The publisher then hands the `compose`d
- function to it's predecessor as the predecessor's own value function
+ function to it's predecessor as the predecessor's own output function
  and the entire process recurses.
  
  Eventually this recursion of function composition reaches the top of
@@ -501,8 +505,8 @@ extension MyMapPublisher: Sinkable {
  
  This step is absolutely at the heart of Combine.  Combine does
  what it does by recursively composing chains of `value` functions
- until it gets to the top of the chain.  It's almost like knitting
- using functions for yarn.
+ until it gets to the top of the chain.  It's almost like knitting,
+ we're just using functions as the yarn.
  
  Now we are ready to implement the `map` function on our original publisher.
  Watch closely.  :)
