@@ -2,7 +2,7 @@ import Combine
 /*:
  ## Higher Order Functions III - Recursive Chaining
  
- In this playground we want to see exactly _how_ Combine uses
+ In this playground we want to begin to see exactly _how_ Combine uses
  functional composition to do what it does.
  We'll do this by writing our own mini version of Combine.
  Remember how in
@@ -203,9 +203,9 @@ extension MySequencePublisher {
  the end of the array, it sends the `.complete` via the `termination` closure.
  
  You should also note this publisher emits its values _immediately_ upon
- invoking sync and _before_ it calls `return`.  So we're not showing
+ invoking `sink` and _before_ it calls `return`.  So we're not showing
  all the features of Combine because this publisher is
- synchronous in nature.  Sort of a bummer, but this is enough for
+ synchronous in nature.  It's sort of a bummer, but this is enough for
  us to see how Combine is architected.  In an _asynchronous_ publisher
  the `return` would happen and the `value` and `termination` closures
  would be invoked at some later point.  They would also have to be marked
@@ -739,6 +739,16 @@ public func curry<A, B, C>(
     }
 }
 /*:
+ And lets do one more so we can be completely point-free below.
+ This one is called `pipe` and it makes everything read nicely
+ left to right by piping the arguments to functions in from the
+ left.
+ */
+infix operator |>: CompositionPrecedence
+public func |> <A, B> (a: A, f: (A) -> B) -> B {
+  return f(a)
+}
+/*:
  The goal in our example below is to replace all of the occurrences of
  inlined closures with functions which Swift can
  infer types on.  We'll remove the closures created in trailing
@@ -749,15 +759,15 @@ public func curry<A, B, C>(
  When looked at that way, you can see the following transformations,
  which we will dissect one by one:
  
-     { $0 * 2 } => curry(*)(Int(2))
+     { $0 * 2 } => 2 |> curry(*)
  
- `curry(*)(Int(2))` here takes the `*` infix operator which is a generic
+ `curry(*)(2)` here takes the `*` infix operator which is a generic
  function of two arguments of the same type.  By currying that function
- and partially applying the value `Int(2)` the compiler is able to infer
+ and partially piping the value `2` into it, the compiler is able to infer
  that we are talking about multiplication of two `Int`s
  rather than multiplication on some other type and therefore can cause
  this expression to return a function which takes one Int argument
- and multiplies it by Int(2). Which is exactly the signature we need to
+ and multiplies it by 2. Which is exactly the signature we need to
  pass to `map` on a `MySequencePublisher` of `Int`s.
  
      { Double($0) } => Double.init
@@ -766,7 +776,8 @@ public func curry<A, B, C>(
  And it turns out that `Double.init` is overloaded on several different
  types, one of which is Int.  So there is a function called
  `Double.init` which takes a single argument of Int and the compiler
- can infer that that is the one mean here.
+ can infer that that is the one mean here.  And this form saves
+ us wrapping the init up into an enclosing closure.
  
      { "\0" } => \.description
 
@@ -779,14 +790,16 @@ public func curry<A, B, C>(
  whatever type you have inferred us to be talking about here and
  invoke the getter named `description` on it. Since `description`
  returns a String, this is precisely the same as what we are doing
- on the left hand side of the => there.
+ on the left hand side of the => there.  Again, since keypaths
+ can be interpreted as functions wrapping `get`, we don't need to
+ wrap it up in an additional closure.
  
  So here are those changes applied to our example:
  */
 var r3 = [String]()
 let c2 = [1, 2, 3]
     .myPublisher
-    .map(curry(*)(Int(2)))
+    .map(2 |> curry(*))
     .map(Double.init)
     .map(\.description)
     .sink { r3.append($0) }
@@ -810,12 +823,15 @@ r3
  So since we have a very handy way of composing functions
  together, lets go ahead and do that.
  */
-let transform = curry(*)(Int(2)) >>> Double.init >>> \.description
+let transform = (2 |> curry(*)) >>> Double.init >>> \.description
 /*:
- Note that transform is of type: `(Int) -> String`. Which, to me
- anyway, seems quite remarkable.  Just like in "Higher Order Functions II"
+ Note that in this form everything reads from left to right, our
+ eyes never need to scan back to try to and figure out which function
+ is using some part of our expression. Also
+ note that `transform` is of type: `(Int) -> String`. Which, to me,
+ seems quite remarkable.  Just like in "Higher Order Functions II"
  we've been able to type erase a lot of stuff and come up with
- a glued together function which perfectly fits what we are trying to
+ a glued-together function which perfectly fits what we are trying to
  do. Now we can take our composed function and use it in one single
  `map` call.
  */
@@ -826,6 +842,13 @@ let c3 = [1, 2, 3]
     .sink { r4.append($0) }
 r4
 /*:
+ One final word,
+ we could have taken the entire expression for `transform`
+ from above and then have
+ pasted it in right there as-is.  That's one of the nice things
+ about this style is that it has that level referential transparency.
+ It helps you do what the Haskell community calls equational reasoning.
+ 
  And now I think we are ready to move ahead to the other features of
  Combine.
  */
