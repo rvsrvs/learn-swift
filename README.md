@@ -33,19 +33,21 @@ laggards remaining, but much of the community still writes its code using
 the OO syntactic elements and is not yet fully up to speed with functional
 kernel.
 
-I believe that Swift 6, Combine and SwiftUI will probably trigger the community
-as a whole to begin leaving its OO code behind and making full use of
+I believe that Swift 6, Combine and SwiftUI represent an inflection point
+where the community as a whole will 
+begin transitioning from the OO paradigm and begin making full use of
 the smaller syntactic core. The ultimate goal of this repository is to help my 
 students move in that direction and prepare them for the shift I see underway
 in the Swift community.
 
-*NB* All code below is in commented playgrounds using Apple's
+*NB* All code in this project is in commented playgrounds using Apple's
 Markdown comment formatting specification. So you'll want to
 do the following in Xcode: `Editor->Show Raw Markup` whenever you open
 a playground.
 
 One final note: I _highly_ recommend reading or watching pretty much everything
-in the bibliography attached at bottom.  It is impossible in a single 
+in the bibliography attached at the bottom of this document.  
+It is impossible in a single 
 work such as this to cover everything in the detail that it deserves, so I've
 incorporated pointers to things that I particularly liked and found helpful
 in the biobliography.  In particular, I cannot recommend the Pointfree.co
@@ -71,7 +73,7 @@ Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
 ## What you'll need
 
-  You will need XCode 11.3 (or later) and a Mac to run it on.
+  You will need XCode 11.4 (or later) and a Mac to run it on.
 
 # An Opinionated Look at Swift
 
@@ -121,11 +123,11 @@ The community is converging on using the functional programming aspects of Swift
 * PATs (Protocols with Associated Types) should be reserved as a feature for people writing framework libraries.  This is still IMHO an immature area of the language. As currently constituted, they introduce a world of hurt except for very specific cases where the programmer truly understands the interactions of the various concrete types being designed. The only exception to this may be protocols which have an only an associatedtype of Self.  If you are planning to make use of PATs you may well want to do some reading on type and category theory to make sure you understand the thinking that has already gone into standard library protocols like Sequence so that you avoid reinventing wheels.
 * the `mutating` keyword on structs. This should be used only as a performance optimization after it has been proven to be to necessary.  It is frequently associated with functions returning Void.  The deprecated pattern is to create a `var` struct or class and then immediately begin mutating its values to properly configure it.  Usage of this pattern should always be replaced with inits which construct the value correctly to begin with.  Inits of this type frequently take closures so you'll want to be aware of how to use closures in your initializers.
 * `var` properties in structs. By default your data structures should be immutable and mutability should only be used after due consideration and a driving performance requirement.  If you make your properties `let` by default, you will find that use of the mutating keyword in the previous point simply goes away on its own.
+* protocols. Protocols should be thought of as somewhat equivalent to `final` in inheritance-based systems.  Because you can only conform any given type to a protocol in one way, you should verify that anything implemented as a protocol is actually the unique implementation for all conforming types.  Most application-level declarations of protocols do not meet this test and should use protocol witness structs instead. So, for example, Hashable and Equatable can be implemented only one way for any given type and are therefore good subjects for protocols.  CustomDebugStringConvertible frequently can be implemented in multiple ways for a given type and in those circumstances should be managed with a protocol witness rather than a conformance.  You should think about this when you go to create a protocol type and by default use a witness type instead.
 
 ### ASPIRE NOT TO USE
 * trailing closure syntax if using Swift versions greater than 5.2.  With the introduction of the ability to use Keypaths in all places that closures can be used and the `callAsFunction` feature, many uses of inline closure declarations are no longer needed and can be replaced with a more "point-free" style.
 * `if` and `if-else` statements (prefer the use of ternary conditionals that return values instead),  If `switch` had a language-supported form which returned values in the way that ternary if's do, switch would join this list.
-* protocols (unless you are absolutely sure that there is only one way for each conforming concrete type to implement the protocol). Most application-level declarations of protocols do not meet this test and should use protocol witness structs instead. (you can thank me later). So, for example, Hashable and Equatable can be implemented only one way for any given type and are therefore good subjects for protocols.  CustomDebugStringConvertible frequently can be implemented in multiple ways for a given type and in those circumstances should be managed with a protocol witness rather than a conformance.  Think about this when you go to create a protocol type.
 
 Note that some of the points above are not iron-clad rules but others are. For-loops, callbacks and inheritance are never needed and should not be used.  Void-returning functions and PATs are appropriate in some specific but infrequent situations. Ternaries over if's and protocol witnesses can be aspirational.  However, all uses of the above should be carefully considered before they are employed in code.
 

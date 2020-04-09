@@ -529,12 +529,18 @@ type(of: c)
  
  This sort of "shape manipulation" is a surprisingly powerful feature
  of functional programming that allows you to glue existing functions
- together in really interesting ways.
+ together in really interesting ways.  It is in fact precisely what
+ John Hughes was talking about in his classic paper
+ ["Why Functional Programming Matters"](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf)
+ when he discusses functional programming providing different kinds of glue
+ for composing applications than what is provided in imperative
+ languages.
  
- NB, everything we've just done, is frequently done in JavaScript as
- well.  And it could also be done in e.g. Java or ObjC.
- There are two differences (and the differences are the entire
- reason that these techniques are not used in Java and ObjC though):
+ NB, everything we've just done is frequently done in JavaScript as
+ well, though a bit more clumsily.
+ And it could be done in e.g. Java or ObjC.
+ There are two big differences though (and the differences are the entire
+ reason that these techniques are not much used in, e.g. Java and ObjC):
  
  1. generics and
  2. syntax.

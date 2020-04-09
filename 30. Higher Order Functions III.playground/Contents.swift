@@ -745,9 +745,7 @@ public func curry<A, B, C>(
  left.
  */
 infix operator |>: CompositionPrecedence
-public func |> <A, B> (a: A, f: (A) -> B) -> B {
-  return f(a)
-}
+public func |> <A, B> (a: A, f: (A) -> B) -> B { f(a) }
 /*:
  The goal in our example below is to replace all of the occurrences of
  inlined closures with functions which Swift can
@@ -761,7 +759,7 @@ public func |> <A, B> (a: A, f: (A) -> B) -> B {
  
      { $0 * 2 } => 2 |> curry(*)
  
- `curry(*)(2)` here takes the `*` infix operator which is a generic
+ `2 |> curry(*)` here takes the `*` infix operator which is a generic
  function of two arguments of the same type.  By currying that function
  and partially piping the value `2` into it, the compiler is able to infer
  that we are talking about multiplication of two `Int`s

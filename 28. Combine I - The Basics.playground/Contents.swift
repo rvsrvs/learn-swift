@@ -227,7 +227,8 @@ type(of: p1)
  Now this starts to look interesting.  Seems like a Publishers.Sequence is a
  generic type that is parameterized by
  `[String]` and `Never`.  What  `Never` represents is a very interesting
- topic that we'll pick up later.
+ topic that we'll pick up later. (Ok, if you really want to here's
+ [a great link on the topic](https://nshipster.com/never/).
  But for now we'll note that the first parameter is the type of the
  value being published and the second one
  is the type of the Error that can occur. Apparently we can expect
