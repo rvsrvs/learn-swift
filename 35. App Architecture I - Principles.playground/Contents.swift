@@ -5,7 +5,18 @@ import Combine
  ## Functional Reactive Programming
  The functional reactive programming (FRP) style as embodied in Combine takes functional decomposition into the asynchronous domain of handling events.  Under FRP you should think of your application as being a collection of functions which are nested in an event loop or loops. In GUI apps that's typically the event loop of the main thread, in server apps, it's the event loop of a worker thread.
 
- When an event enters the event loop, a function is selected to dispatch the event into. That function is called by passing in 1) the current state of the application AND 2) the new event.  The function returns 3) a tuple composed of the new state of the application and 4) any side-effects to be performed. In this model, ApplicationState is an immutable value type wrapped in a reference type which is mutable.  The old value type is replaced at the end of the event loop by the new value computed by the function the event was dispatched into and any accumulated side-effects are dispatched.
+ When an event enters the event loop, a function is selected to dispatch the event into.
+ That function is called by passing in:
+ 
+ 1. the current state of the application AND
+ 2.  the new event.
+ 
+ The function then returns:
+ 
+ 3. a tuple composed of the new state of the application and
+ 4. any side-effects to be performed.
+ 
+ In this model, ApplicationState is an immutable value type wrapped in a reference type which is mutable.  The old value type is replaced at the end of the event loop by the new value computed by the function the event was dispatched into and any accumulated side-effects are dispatched.
 
  Wrt to side-effects: in this model, side-effects are “pushed to the edge of the world” by cumulating them and executing them at the bottom of the event loop after execution of the event-handling function.   Side-effects can generate new events, which enter the queue of events to be processed.  Some types of side-effects that you can think of include: updating the display, firing a network request, and starting a timer.
 
