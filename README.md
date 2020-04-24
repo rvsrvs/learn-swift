@@ -199,7 +199,7 @@ If you are coming from an OO background it is frequently the case that you will 
 * Classes and protocols look quite familiar to what you are accustomed to in Java or ObjC or JavaScript and should be the first tool you reach for when designing new code, just as they are in those languages.
 * Structs seem like classes with several useless limitations 
 * Functions appear to be just like methods
-* Generics seem a bit superfluous and 
+* Generics seem a bit superfluous given that inheritance is available for classes
 * Enums and tuples look like trivial extensions from C 
 
 Be aware that each and every one of these perceptions is mistaken in some fundamental way. 
