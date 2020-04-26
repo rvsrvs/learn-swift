@@ -172,7 +172,19 @@ Wrt to side-effects: in this model, side-effects are “pushed to the edge of th
 
 This model is precisely the one used by SwiftUI. Display update is a direct side-effect of updating ApplicationState implemented as part of the SwiftUI framework.  SwiftUI's Views are not mutable for this reason.  They are generated using a particular value of the Application State to which they are connected by property wrappers of various forms.
 
-The above ineluctably implies that long-running applications should be organized as collections of functions of the form: (ApplicationState, Event)->(ApplicationState, [Effect<Action>]).  In functional programming terms, functions with this signature are called reducers. Your application should decompose this function into a chain of function invocations mediated by the type system. If you are working with a mutable ApplicationState, this signature is (&ApplicationState, Event)->[Effect<Action>]. The equivalent form of this latter function in OO notation is: applicationState.handle(anEvent)->[Effect<Action>] where the applicationState is mutated by the event handling method call.  
+The above ineluctably implies that long-running applications should be organized as collections of functions of the form: 
+     
+     (ApplicationState, Event)->(ApplicationState, [Effect<Action>])  
+     
+In functional programming terms, functions with this signature are called reducers. Your application should decompose this function into a chain of function invocations mediated by the type system. If you are working with a mutable ApplicationState, this signature is 
+
+    (&ApplicationState, Event)->[Effect<Action>] 
+
+The equivalent form of this latter function in OO notation is: 
+
+    applicationState.handle(anEvent)->[Effect<Action>] 
+    
+where the applicationState is mutated by the event handling method call.  
 
 The unconstrained creation of side-effects arising from the introduction of mutation by the OOP style is a critical difference between the two approaches. This difference explains why you don't want to return Void during your function application. Returning Void anywhere in this chain is a clear signal that you have introduced a side-effect that is not being pushed to the edge of the world and it breaks the flow of the function invocation chain, to boot.
 

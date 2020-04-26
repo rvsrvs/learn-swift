@@ -73,28 +73,28 @@ switch directionToHead {
 
  Associated values allows us to store information with each member of the switch using a Tuple.
 
- The following enumeration will store not only the type of a barcode (UPCA, QR Code) but also
+ The following enumeration will store not only the type of a barcode (upca, QR Code) but also
  the data of the barcode (this is likely a foreign concept for most.)
 */
 enum Barcode {
-	case UPCA(Int, Int, Int) // UPCA with associated value type (Int, Int, Int)
-	case QRCode(String)      // QRCode with associated value type of String
+	case upca(Int, Int, Int) // upca with associated value type (Int, Int, Int)
+	case qrCode(String)      // qrCode with associated value type of String
 }
 /*:
- Let's specify a UPCA code (letting the compiler infer the enum type of Barcode):
+ Let's specify a upca code (letting the compiler infer the enum type of Barcode):
  */
-var productBarcode = Barcode.UPCA(0, 8590951226, 3)
+var productBarcode = Barcode.upca(0, 8590951226, 3)
 /*:
  Let's change that to a QR code (still of a Barcode type)
  */
-productBarcode = .QRCode("ABCDEFGHIJKLMNOP")
+productBarcode = .qrCode("ABCDEFGHIJKLMNOP")
 /*:
  We use a switch to check the value and extract the associated value:
 */
 switch productBarcode {
-	case .UPCA(let numberSystem, let identifier, let check):
-		"UPCA: \(numberSystem), \(identifier), \(check)"
-	case .QRCode(let productCode):
+	case .upca(let numberSystem, let identifier, let check):
+		"upca: \(numberSystem), \(identifier), \(check)"
+	case .qrCode(let productCode):
 		"QR: \(productCode)"
 }
 /*:
@@ -103,11 +103,11 @@ switch productBarcode {
 */
 switch productBarcode {
 	// All constants
-	case let .UPCA(numberSystem, identifier, check):
-		"UPCA: \(numberSystem), \(identifier), \(check)"
+	case let .upca(numberSystem, identifier, check):
+		"upca: \(numberSystem), \(identifier), \(check)"
 	
 	// All variables
-	case let .QRCode(productCode):
+	case let .qrCode(productCode):
 		"QR: \(productCode)"
 }
 /*:
@@ -117,29 +117,29 @@ switch productBarcode {
  making an enumeration that functions like its C counterpart:
 */
 enum StatusCode: Int {
-	case Error = -1
-	case Success = 9
-	case OtherResult = 1
-	case YetAnotherResult // Unspecified values are auto-incremented from the previous value
+	case error = -1
+	case success = 9
+	case otherResult = 1
+	case yetAnotherResult // Unspecified values are auto-incremented from the previous value
 }
 
-StatusCode.Error.rawValue
+StatusCode.error.rawValue
 /*:
  We can get the raw value of an enumeration value with the rawValue member:
 */
-StatusCode.OtherResult.rawValue
+StatusCode.otherResult.rawValue
 /*:
  We can give enumerations many types. Here's one of type Character:
 */
 enum ASCIIControlCharacter: Character {
-	case Tab = "\t"
-	case LineFeed = "\n"
-	case CarriageReturn = "\r"
+	case tab = "\t"
+	case lineFeed = "\n"
+	case carriageReturn = "\r"
 	
 	/*: Note that only Int type enumerations can auto-increment. Since this is a Character type,
 	 the following line of code won't compile:
 	```
-	 case VerticalTab
+	 case verticalTab
      ```
  */
 }
@@ -147,14 +147,14 @@ enum ASCIIControlCharacter: Character {
  Alternatively, we could also use Strings
  */
 enum FamilyPet: String {
-	case Cat = "Cat"
-	case Dog = "Dog"
-	case Ferret = "Ferret"
+	case cat = "Cat"
+	case dog = "Dog"
+	case ferret = "Ferret"
 }
 /*:
  And we can get their raw value as well:
 */
-FamilyPet.Ferret.rawValue
+FamilyPet.ferret.rawValue
 /*:
  We can also generate the enumeration value from the raw value. Note that this is an optional
  because not all raw values will have a matching enumeration:
