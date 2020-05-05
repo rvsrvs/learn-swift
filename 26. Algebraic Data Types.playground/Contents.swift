@@ -562,7 +562,7 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
 
  Anyone see a pattern here? Yeah:
  
-     (A) -> B : has B to the power of A (B ^ A) cardinality
+     (A) -> B : has cardinality B to the power of A (B ^ A)
  
  Tah Dah functions are exponential types! Specifically,
  
