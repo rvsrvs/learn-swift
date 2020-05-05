@@ -25,7 +25,7 @@
  And I was wrong.
  
  It has taken about 6 years or working with the language on daily basis
- for me to see the language in this 7/20/10 light.  Seeing it this way
+ for me to see the language in this 70/20/10 light.  Seeing it this way
  has completely changed my approach to the language and my style
  of using it.
  
