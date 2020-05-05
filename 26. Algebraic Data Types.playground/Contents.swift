@@ -391,7 +391,8 @@ enum TwoPlusTwoPlusOne{
     case threeAndFour(Bool)
     case five
 }
- /*:
+
+/*:
  Again anywhere I could use Six, I could use TwoPlusTwoPlusTwo with
  the appropriate mechanical translation and vice-versa. And anywhere
  I could use Five I could use TwoPlusTwoPlusOne.
@@ -403,13 +404,16 @@ enum TwoPlusTwoPlusOne{
  And as you might have guessed by now enums are called Sum types because
  everytime I add a case to an enum, I'm _adding_ the cardinality associated
  with the case to the overall cardinality of enum.  In structs and tuples
- I multiply for each new var, in enums I add for each new case.
+ when I add a new var of a given type,
+ I multiply the cardinality of the struct by the cardinality
+ of the type I'm adding. In enums, I add for each new case.
  
  And the two combined allow me to have precisely the cardinality that I
  want.
  
  Let's do another form of a three-valued type:
  */
+
 enum BoolPlusOne {
     case bool(Bool)
     case notBool
@@ -448,7 +452,7 @@ let fourteen = PowerOfThree.one(.one(.two(.terminate)))
  ### Functions are people too, Functions as Types
  
  So we have Product types and we have Sum types.
- And that allows to have types with _any_ cardinality
+ And that allows us to have types with _any_ cardinality
  we find useful, without clumsy circumlocutions.
  
  So let's take a look at functions of those types
