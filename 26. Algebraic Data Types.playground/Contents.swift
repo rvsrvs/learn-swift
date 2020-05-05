@@ -96,10 +96,15 @@
  
  The "size" of the set is called it's cardinality. We can observe things about cardinality:
  
- 1. Each type with identical cardinality is in some sense the same type.  We call this being
- isomorphic
- 2. Isomorphism means that I can mechanically convert from one type to another and back.
- 3. So we can classify types by their cardinality
+ 1. Each type with identical cardinality is in some sense the same type.
+ 2. What I mean by this is that I can mechanically convert from one
+ type to another and back, paying attention only to the values in the type and not
+ any of the relationships between that values that you might think of as existing.
+ 3. So one way that we can classify types is by their cardinality.
+ 
+ Our goal in this playground is to show that Swift lets us build up types with
+ any cardinality that we like. Then we can add additional structure to that
+ type to our hearts content.  That’s in effect what Swift is about letting us do.
  
  ### Structs Bool, BoolBool, BoolBoolBool, Boolah Boolah
  
@@ -115,15 +120,23 @@ b = false
  Each element can be unambiguously identified.  The cardinality is two.
  This is definitely a type.
  
- Any type with
- just two values is isomorphic to `Bool`.  For example, how many values can
- the struct `BoolWrapper` assume?
+ Any type with just two values is equivalent to `Bool` in the sense
+ we discuss above, i.e. you can tranlate in and out of it.  If you are a
+ C programmer for example you are very used to translating between Bool and Int
+ by ignoring values greater than one.
+ 
+ So to give an example, how many values can the struct `BoolWrapper` below assume?
 */
 struct BoolWrapper {
      var b: Bool
  }
 /*:
-How many values are there in the following struct:
+ Answer: 2 here they are:
+ */
+var bw1 = BoolWrapper(b: true)
+var bw2 = BoolWrapper(b: false)
+ /*:
+ How many values are there in the following struct:
  */
 struct BoolBool {
     var b1: Bool
@@ -144,7 +157,6 @@ struct BoolBoolBool {
     var b2: Bool
     var b3: Bool
 }
-
 /*:
 *Answer: 8*  Here they are:
 */
@@ -178,11 +190,8 @@ struct BoolLittleInt {
 /*:
  Answer: 512.  Do you see why?
  
- Now ask yourself: How many values are there in Int?
- How many values are there in String?
- 
  So the pattern is that every time you add a `var` to a `struct`
- the cardinality of the struct type gets multiplied by the cardinality
+ the cardinality of the type gets multiplied by the cardinality
  of the type you added. This is general truth for _all_ structs.
 
  Hence `struct`s are called (tah dah) Product types.
@@ -226,6 +235,7 @@ type(of: tup)
  get more interesting.
  */
 var tuptup: (Bool, Bool) = (true, true)
+typealias StructuralBoolBool = (Bool, Bool)
 type(of: tuptup)
 /*:
  Swift syntax allows us to put annotations on our structural types, provided
@@ -413,7 +423,6 @@ enum TwoPlusTwoPlusOne{
  
  Let's do another form of a three-valued type:
  */
-
 enum BoolPlusOne {
     case bool(Bool)
     case notBool
@@ -431,23 +440,6 @@ enum BoolPlusOne {
  I could not have a Bool. It's optional as to which I have.
  And I do that by taking a two-valued type and
  adding one more value to it.
- 
- One more fact about enums that's worth noting is that I can
- raise the cardinality of the type to powers by nesting them. Let's do
- an example.
- */
-indirect enum PowerOfThree {
-    case zero(PowerOfThree)
-    case one(PowerOfThree)
-    case two(PowerOfThree)
-    case terminate
-}
-
-let fourteen = PowerOfThree.one(.one(.two(.terminate)))
-/*:
- Mental excercise: Why did I choose that name for that variable?
- Note, it might seem backwards to you based on how you interpret
- the enum.
 
  ### Functions are people too, Functions as Types
  
@@ -877,7 +869,28 @@ func neverToNever(_ n: Never) -> Never {
  You might think that you'll _never_ use `Never` - and you'd be as wrong as
  the ancient mathemeticians who never considered using zero in math. And
  then along came Arabic numerals.
-  
+ 
+ Speaking of Arabic numerals....
+ 
+ One more fact about enums that's worth noting is that I can
+ raise the cardinality of the type to powers by nesting them. Let's do
+ an example.
+ */
+ indirect enum PowerOfThree {
+     case zero(PowerOfThree)
+     case one(PowerOfThree)
+     case two(PowerOfThree)
+     case terminate
+ }
+
+ let fourteen = PowerOfThree.one(.one(.two(.terminate)))
+ /*:
+  Mental excercise: Why did I choose that name for that variable?
+  Note, it might seem backwards to you based on how you interpret
+  the enum.
+ */
+
+/*:
  ### The Meaning of Generics
  
  Ok so we have arithmetic of types.  We can add them, multiply them
@@ -906,14 +919,34 @@ enum Optional<T> {
 }
 /*:
  Here's a really informative way to look at that:
- 
-     f(x) = x + 1
- 
- `Optional<T>` is a function that takes a type T as an argument and
- adds one value to it.  Addition in ADT's is represented by an enum,
+
+    f(x) = x + 1
+
+`Optional<T>` is a function that takes a type T as an argument and
+ adds one value to it, so its cardinality is the cardinality of T
+ plus one.  Addition in ADT's is represented by an enum,
  so the Optional needed to be an enum.
+*/
+enum Either<X, Y> {
+    case left(X)
+    case right(Y)
+}
+/*:
+ The cardinality of that is:
  
- This is one of the places where nominal typing can obscure some
+    f(x) = x + y
+ */
+struct Both<X, Y> {
+    var x: X
+    var y: Y
+}
+/*:
+The cardinality of that is:
+
+   f(x) = x * y
+
+ Understanding the above
+ is one of the places where nominal typing can obscure some
  really important insights.  People coming to Swift from ObjC or
  another language without a reasonably complete system of ADT's
  will look at Optional and think: "This is just they way of avoiding
