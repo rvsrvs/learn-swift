@@ -166,6 +166,11 @@ struct BoolLittleInt {
  that's it, the name alone determines the type.  Languages that use the name
  to delineate the type are said to have nominal types,
  languages that use the structure are said to have structural types.
+ (NB The [Swift book](https://docs.swift.org/swift-book/ReferenceManual/Types.html):
+ refers to these as `compound` types, but that's not what the PL
+ community calls them. They call them structural types and since
+ I prefer that name and I'm the teacher and it's my playground,
+ that's what we'll call them).
  
  Swift has both. In Swift, structural types cannot have names, structure alone
  specifies the type.  Nominal types in Swift have to have unique names and
