@@ -1,83 +1,11 @@
-/*: 
- ## Algebraic Data Types
-
- It is my observation that Swift as a language has three parts:
-
- 1. a relatively small kernel of syntax and
- functionality that centers around Swift's powerful type system and
- makes excellent use of contemporary functional programming patterns.
- Call this kernel 10% of the language.
- 
- 2. a larger set of syntax that is built on the 10% kernel and which
- adds useful syntactic sugar to the kernel, curated from a variety
- of other languages to the tastes of the Swift core team at Apple.
- I typically talk about this as being another 20% of the language.
- 
- 3. An enormous layer of features which exists to provide backwards
- compatibility to C, Objective C, and even Python. This portion of the language
- makes use of standard single inheritance, pointer-based, object-oriented
- programming techniques. Call this 70% of the language.
-
- What frequently confuses people coming to Swift from other OO languages is
- that they feel that because they know and are familiar with the large portions
- of the 70% and they can use portions of the 20%,
- they then feel that they "know" the language.  This happened to me.
- And I was wrong.
- 
- It has taken about 6 years or working with the language on daily basis
- for me to see the language in this 70/20/10 light.  Seeing it this way
- has completely changed my approach to the language and my style
- of using it.
- 
- I used to start this class off with the following warning:
- 
- ——————————————————————————————————
- 
- THINGS IN SWIFT THAT EVERYONE HAS PROBLEMS WITH
- 
- * Special Syntax
- * The Type System
- * Closures, and in particular "trailing closure syntax"
- * Generics
- * Optionals
- * map/reduce/zip
- * value types and reference types
- 
- ——————————————————————————————————
-
- When teaching the type system, I would make everyone memorize
- the fundamental elements of the Swift type system:
- `function, tuple, struct, enum, class, protocol` because
- I felt the type system was idiosyncratic and that
- rote memorization was the only way you
- could learn it.
- 
- Now I know that the reason its hard is because my teaching
- sucked.  The point of this playground is to suck less.
- 
- The secret to life is setting expectations correctly.
- 
- (BTW, you will still have to learn all six elements of the type system.
- My hope is that they don't seem like idiosyncratically chosen
- random bits and pieces glued in from C and ObjC after this).
- 
- If you are coming from an OO background it is frequently the case
- that you will think the following things when you pick up Swift:
- 
- * Classes and protocols look quite familiar to what you are
- accustomed to in Java or ObjC or JavaScript and should be the
- first tool you reach for when designing new code, just as they are in those languages.
- * Structs seem like classes with several useless limitations
- * Functions appear to be just like methods
- * Generics seem a bit superfluous given that inheritance is available for classes
- * Enums and tuples look like trivial extensions from C
- 
- Be aware that each and every one of these perceptions is mistaken in some fundamental way.
- 
- We'll start disabusing you of these notions now.
- */
-
 /*:
+ ## Algebraic Data Types
+ 
+ NB In this playground we are experimenting with types.  There aren't any calls
+ to function, but in a few places you'll want to have run the playground
+ so that you can see the types over on the right.  So don't forget
+ to do that.
+
  ### Types are sets of identifiable objects
  
  It's important that we be able to say clearly what a type is.  The most useful definition
@@ -87,9 +15,10 @@
  2. Each thing can only be in the set once
  3. We can identify every element of the set unambiguously
  
- ### Types have cardinality
+ ### Types have a size (aka cardinality)
  
- If a type is a set, then we can say how many things are in the set. The number may be
+ If a type is a set, then we should be able to say how
+ many things are in the set. The number may be
  infinite in theory but in programming practice we are constrained to finite size things.
  Really large, but still finite.  If we constrain ourselves to Strings of less than 100TB for
  example, I doubt that much of life would change.
@@ -105,6 +34,22 @@
  Our goal in this playground is to show that Swift lets us build up types with
  any cardinality that we like. Then we can add additional structure to that
  type to our hearts content.  That’s in effect what Swift is about letting us do.
+ 
+ Having correct cardinality of our types helps do two things:
+ 
+ 1. It eliminates an entire class of errors that arises from having
+ invalid values for types.  If the cardinality is specified correctly
+ it is impossible to have an invalid value.  You might get the specification
+ wrong and have an inapprorpiate type for what you are trying to do
+ but that's a different problem.
+ 
+ 2. Most importantly, having correct cardinality on our types allows
+ the compiler to provide us much more help when coding.  It can keep
+ us from typing things that don't make sense and suggest thing that do.
+ It can identify when you haven't covered every input that you should or
+ when you are trying to generate an output that you shouldn't.  In
+ other words it helps us be the lazy selves we aspire to be and in so
+ doing it makes us better, faster coders.
  
  ### Structs Bool, BoolBool, BoolBoolBool, Boolah Boolah
  
@@ -123,19 +68,25 @@ b = false
  Any type with just two values is equivalent to `Bool` in the sense
  we discuss above, i.e. you can tranlate in and out of it.  If you are a
  C programmer for example you are very used to translating between Bool and Int
- by ignoring values greater than one.
+ by ignoring values greater than one in your `Int` type.
  
- So to give an example, how many values can the struct `BoolWrapper` below assume?
+ So to give an example cardinality of one our own types,
+ how many values can the struct `BoolWrapper` below assume?
 */
 struct BoolWrapper {
      var b: Bool
  }
+
 /*:
- Answer: 2 here they are:
+ Answer: 2. And here they are:
  */
+
 var bw1 = BoolWrapper(b: true)
 var bw2 = BoolWrapper(b: false)
- /*:
+/*:
+ Don't believe me?  Show me another value of BoolWrapper than
+ besides those two.
+ 
  How many values are there in the following struct:
  */
 struct BoolBool {
@@ -259,7 +210,7 @@ nameTupTup = tuptup
 nameTupTup
 /*:
  This shows that underneath _ALL_ structural types having the same
- structure all the same type.
+ structure are the same type.
  
  Nominal types with that same structure though are NOT the same.
  BoolBool is a nominal type with the structure (Bool, Bool) so
@@ -281,7 +232,8 @@ var bb = BoolBool(b1: true, b2: false)
  keyword so much in Swift, and it will be hugely important a few playgrounds
  from now.
  
- Here's an extension of our BoolBool nominal type.
+ Here's an extension of our BoolBool nominal type. Note that
+ the extension is associated with the _name_ of a type.
  */
 extension BoolBool {
     var description: String { "b1: \(b1), b2: \(b2)"}
@@ -289,7 +241,8 @@ extension BoolBool {
 /*:
  Try doing that extension for the tuptup variable above.
  It can't even be begun, because the type of tuptup _has no name_.
- And that fact alone means you can't use anything to make an extension.
+ And that fact alone means you don't have anything
+ that you can use to make an extension.
 */
 /*:
  ### Enums as Sum Types
@@ -384,6 +337,15 @@ var tbt4 = TwoPlusTwoPlusTwo.two(true)
 var tbt5 = TwoPlusTwoPlusTwo.three(false)
 var tbt6 = TwoPlusTwoPlusTwo.three(true)
 /*:
+ I could also do a six valued type as 3x2 rather than 2+2+2:
+ */
+struct ThreeTimesTwo {
+    var three: Three
+    var two: Bool
+}
+/*
+ You can work out the values there for yourself.
+ 
  I could do a five-valued type as:
  */
 enum Five {
@@ -401,14 +363,13 @@ enum TwoPlusTwoPlusOne{
     case threeAndFour(Bool)
     case five
 }
-
 /*:
  Again anywhere I could use Six, I could use TwoPlusTwoPlusTwo with
  the appropriate mechanical translation and vice-versa. And anywhere
  I could use Five I could use TwoPlusTwoPlusOne.
  
- It's the cardinality
- that matters here.  The structure we put on top of that cardinality is for
+ It's the cardinality that matters here.
+ The structure we put on top of that cardinality is for
  our convenience.
  
  And as you might have guessed by now enums are called Sum types because
@@ -780,7 +741,7 @@ enum ThreeVoid {
  you called it, why would you ever call it?  Oh yeah, side-effects.
  I.e. you only call a Void-returning function to get the side-effect.
  And you only call a function that takes (Void) to get non-determinism,
- i.e. like certain laws, you have to call it to find out what's in it.
+ i.e. like certain laws, you have to pass it (a value) to find out what's in it.
  With a Void-accepting function, you don't know what value you'll get back.
  
  Swift's way of getting out of pure functions and allowing side-effects
@@ -884,115 +845,9 @@ func neverToNever(_ n: Never) -> Never {
  }
 
  let fourteen = PowerOfThree.one(.one(.two(.terminate)))
- /*:
+
+/*:
   Mental excercise: Why did I choose that name for that variable?
   Note, it might seem backwards to you based on how you interpret
   the enum.
  */
-
-/*:
- ### The Meaning of Generics
- 
- Ok so we have arithmetic of types.  We can add them, multiply them
- and raise them to powers.  Do we have algebra as well?  Can we have
- functions of types.  Sure we can!
- 
- Generics are the functions of types - they take types in and return new types.
- This is the important point, we pass a type or types to a function and
- they give us entirely new types.
- 
- There's one very big difference, these functions don't get invoked
- at run time - they can only be invoked at compile time.  If you think about
- it, we want to use the types that generics give us in our code, so
- these type functions need to run during the compile phase so that we
- can use the results.  If they ran at run time we could not have written
- code that used the types we created.
- 
- In  a very real sense generics are us programming
- the Swift compiler to produce usable new types for us.
- 
- Lets extend our Optional example from above.
- */
-enum Optional<T> {
-    case some(T)
-    case none
-}
-/*:
- Here's a really informative way to look at that:
-
-    f(x) = x + 1
-
-`Optional<T>` is a function that takes a type T as an argument and
- adds one value to it, so its cardinality is the cardinality of T
- plus one.  Addition in ADT's is represented by an enum,
- so the Optional needed to be an enum.
-*/
-enum Either<X, Y> {
-    case left(X)
-    case right(Y)
-}
-/*:
- The cardinality of that is:
- 
-    f(x) = x + y
- */
-struct Both<X, Y> {
-    var x: X
-    var y: Y
-}
-/*:
-The cardinality of that is:
-
-   f(x) = x * y
-
- Understanding the above
- is one of the places where nominal typing can obscure some
- really important insights.  People coming to Swift from ObjC or
- another language without a reasonably complete system of ADT's
- will look at Optional and think: "This is just they way of avoiding
- segfaults for NULL values.  Well, yes, it is, but it's actually
- much more.  It's a very general way of incrementing types.  And
- that functionality is so important that it has been given special
- syntax and a specific nominal type in the language.
- 
- So look at Generics and think: function of types.
- Swift helps you with this, because even the syntax
- is reminiscent of function: `Optional<T>`
- _looks_ as if we are passing a T to a function.
-
- ### The meaning of protocols
- 
- I highly recommend that you read (Joe Groff's explanation of how protocols and generics are related)[https://forums.swift.org/t/improving-the-ui-of-generics/22814]
- 
- I'll summarize it a bit for this context:
- 
- 1. Generics can be thought of as functions of types.  You plug in a type to a generic
- and it produces a new type as a result, just like giving any pure function an input value
- produces an output value.  And that's fun to do.  It's like drawing graphs in algebra,
- we put in a value, get an output and plot the two against each other.
- 
- 2. But... (you knew that was coming) It is really handy though to be
- able to _solve_ systems of functions simultaneously. That is, you want to say:
- yes I know that if f(x) = x^2 I can draw a pretty graph.  But what value(s) of
- x makes f(x) = 4.  For that we need _type constraints_.
- 
- 3. But constraints can both over- and under-constrain a problem. Under-constrain means
- that for f(x) = x^2, we constrain x >= 0.  There are lots of solutions to that problem.
- How 'bout if I make a constrain that f(x) < 0?  There aren't any solutions to that. In
- the first case, I have under-constrained the problem in that if I want the type system
- to produce a type with that set of constraints, it can't because it doesn't have enough
- information to know which one I mean.  In the second, it can't because there is no
- such type.
- 
- 4. Properly done, when we apply constraints to generics, there can be only one type
- that exists and the compiler can give us that type to work with.  This type is called
- the existential type. And it's what a protocol really is.
- 
- 3. Swift offers a really powerful system of type constraints.
- 
- 1. Protocols emerge when you try to solve simultaneous functions of types - the represent existential quantification
- 2. For protocols, Swift creates the existential type and it is that type that you extend when you write a protocol extension.
- 3. Existential types (aka protocols) are just as "real" as Universal types (aka generics)
-
- */
-

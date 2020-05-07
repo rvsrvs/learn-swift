@@ -75,6 +75,75 @@ Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
   You will need XCode 11.4 (or later) and a Mac to run it on.
 
+# Introduction
+
+It is my observation that Swift as a language has three parts:
+
+1. a relatively small kernel of syntax and
+functionality that centers around Swift's powerful type system and
+makes excellent use of contemporary functional programming patterns.
+Call this kernel 10% of the language.
+
+2. a larger set of syntax that is built on the 10% kernel and which
+adds useful syntactic sugar to the kernel, curated from a variety
+of other languages to the tastes of the Swift core team at Apple.
+I typically talk about this as being another 20% of the language.
+
+3. An enormous layer of features which exists to provide backwards
+compatibility to C, Objective C, and even Python. This portion of the language
+makes use of standard, single inheritance, pointer-based, object-oriented
+programming techniques. Call this 70% of the language.
+
+What frequently confuses people coming to Swift from other OO languages is
+that they feel that because they know and are familiar with the large portions
+of the 70% and they can use portions of the 20% fairly quickly,
+they then feel that they "know" the language.  This happened to me.
+And I was wrong.
+
+This workspace covers the 70% and portions of the 20% in Playgrounds 1-25.
+Knowing all of this syntax is necessary in order read Swift, but it doesn't guide
+you in how to write it.  Playground 26 forward does that.
+
+It has taken about 6 years of working with the language on a daily basis
+for me to see the language in this 70/20/10 light.  Seeing it this way
+has completely changed my approach to the language and my style
+of using and teaching it.  These playgrounds are an adaptation
+of that style.
+
+### Understanding the Swift Type System
+
+I used to start this class off with the following warning:
+
+——————————————————————————————————
+
+THINGS IN SWIFT THAT EVERYONE HAS PROBLEMS WITH
+
+* Special Syntax
+* The Type System
+* Closures, and in particular "trailing closure syntax"
+* Generics
+* Optionals
+* map/reduce/zip
+* value types and reference types
+
+——————————————————————————————————
+
+When teaching the type system, I would make everyone memorize
+the fundamental elements of the Swift type system:
+`function, tuple, struct, enum, class, protocol` because
+I felt the type system was idiosyncratic and that
+rote memorization was the only way you
+could learn it.
+
+Now I know that the reason its hard is because my teaching
+sucked.  The point of this playground is to suck less.
+
+The secret to life is setting expectations correctly.
+
+(BTW, you will still have to learn all six elements of the type system.
+My hope is that they don't seem like idiosyncratically chosen
+random bits and pieces glued in from C and ObjC after this).
+
 # An Opinionated Look at Swift
 
 ## Coding Guidelines
