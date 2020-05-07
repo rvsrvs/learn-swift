@@ -1,5 +1,5 @@
 /*:
-  ## Closures
+  # Closures
   
  * Closures are simply anonymous blocks of code.
 

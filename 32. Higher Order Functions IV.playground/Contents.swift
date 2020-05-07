@@ -1,4 +1,4 @@
 /*:
- ## Higher Order Functions IV - Contravariance
+ # Higher Order Functions IV - Contravariance
 
  */

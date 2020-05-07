@@ -1,5 +1,5 @@
 /*:
- ## Algebraic Data Types
+ # Algebraic Data Types I - Arithmetic of Types
  
  NB In this playground we are experimenting with types.  There aren't any calls
  to function, but in a few places you'll want to have run the playground

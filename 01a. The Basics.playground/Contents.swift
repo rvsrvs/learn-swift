@@ -1,6 +1,6 @@
 /*:
 
- ## Things to know
+ # Things to know
 
  * These playgrounds are modified versions of Paul Nettle's original which can be found
  at: [GitHub](https://github.com/nettlep/learn-swift)

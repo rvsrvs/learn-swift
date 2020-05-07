@@ -1,5 +1,5 @@
 /*:
- ## Type Aliases
+ # Type Aliases
  
  Type Aliases allow you to provide a different name for types, similar to 'typedef' in C.
  Here we create an alias for UInt16 called "AudioSample"

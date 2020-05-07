@@ -1,4 +1,6 @@
 /*:
+ # Algebraic Data Types II - Algebra with Types
+ 
  ### The Meaning of Generics
  
  Ok so we have arithmetic of types.  We can add them, multiply them
@@ -57,8 +59,9 @@ The cardinality of that is:
  is one of the places where nominal typing can obscure some
  really important insights.  People coming to Swift from ObjC or
  another language without a reasonably complete system of ADT's
- will look at Optional and think: "This is just they way of avoiding
- segfaults for NULL values.  Well, yes, it is, but it's actually
+ will look at Optional and think: "This is just their way of avoiding
+ segfaults for NULL values".  Well, yes, it is.
+ But it's actually
  much more.  It's a very general way of incrementing types.  And
  that functionality is so important that it has been given special
  syntax and a specific nominal type in the language.
@@ -70,7 +73,7 @@ The cardinality of that is:
 
  ### The meaning of protocols
  
- I highly recommend that you read (Joe Groff's explanation of how protocols and generics are related)[https://forums.swift.org/t/improving-the-ui-of-generics/22814]
+ I highly recommend that you read [Joe Groff's explanation of how protocols and generics are related](https://forums.swift.org/t/improving-the-ui-of-generics/22814)
  
  I'll summarize it a bit for this context:
  

@@ -1,6 +1,7 @@
 /*:
-## Optionals
-* An optional value is a stored value that can either hold a value or "no value at all"
+# Optionals
+
+ * An optional value is a stored value that can either hold a value or "no value at all"
  
  * There is a special keyword in Swift which denotes this notion of "no value at all".
  The keyword `nil` comes from ObjectiveC where it is,

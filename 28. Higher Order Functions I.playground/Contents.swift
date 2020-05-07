@@ -1,5 +1,5 @@
 /*:
- # Higher Order Functions I
+ # Higher Order Functions I - Functions as Arguments to Functions
  
  ### Functions Taking Functions as Arguments
  

@@ -1,7 +1,8 @@
-import Combine
 /*:
- ## Higher Order Functions III - Recursive Chaining
- 
+ # Higher Order Functions III - Recursive Chaining
+ */
+ import Combine
+/*:
  In this playground we want to begin to see exactly _how_ Combine uses
  functional composition to do what it does.
  We'll do this by writing our own mini version of Combine.
