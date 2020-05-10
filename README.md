@@ -14,15 +14,20 @@ The goal is to provide a broad reference to Swift language syntax for students n
 the language and then focus in sharply on the 
 parts of the language that make use of functional programming techniques.
 
-It is my observation that Swift as a language has two parts: 
+It is my observation that Swift as a language has three parts:
 
-1. a relatively small kernel of syntax and 
-functionality that centers around Swift's powerful type system and 
-makes excellent use of contemporary functional programming patterns 
-and 
-2. a much larger set of syntax that exists to provide backwards compatibility to C,
-Objective C, and even Python and which makes use of standard single inheritance,
-pointer-based, object-oriented programming techniques.  
+1. a relatively small kernel of syntax and
+functionality that centers around Swift's powerful type system and
+makes use of contemporary functional programming patterns.
+
+2. a larger set of syntax that is built on the kernel and which
+adds useful syntactic sugar curated from a variety
+of other languages to the tastes of the Swift core team at Apple.
+
+3. A layer of features which exists to provide backwards
+compatibility to C, Objective C, and even Python. This portion of the language
+makes use of standard, single inheritance, pointer-based, object-oriented
+programming techniques.
 
 Given the state of Apple's platform in 2010 when Swift
 development began, the backwards compatibility layer inescapably had to be developed
@@ -77,27 +82,22 @@ Swift versions >= 4,  and Sections > 23 are by Van Simmons.
 
 # Introduction
 
-It is my observation that Swift as a language has three parts:
+Going back to the notion of the language having three parts, 
+I think we can assign some syntactic weights to them:
 
-1. a relatively small kernel of syntax and
-functionality that centers around Swift's powerful type system and
-makes excellent use of contemporary functional programming patterns.
-Call this kernel 10% of the language.
+1. the kernel: call this 10% of the language.
 
-2. a larger set of syntax that is built on the 10% kernel and which
-adds useful syntactic sugar to the kernel, curated from a variety
-of other languages to the tastes of the Swift core team at Apple.
-I typically talk about this as being another 20% of the language.
+2. the syntactic sugar layer: I typically talk about this as being 
+another 20% of the language.
 
-3. An enormous layer of features which exists to provide backwards
-compatibility to C, Objective C, and even Python. This portion of the language
-makes use of standard, single inheritance, pointer-based, object-oriented
-programming techniques. Call this 70% of the language.
+3. the backwards compatibility layer: I would argue that this
+comprises about 70% of the language.
 
-What frequently confuses people coming to Swift from other OO languages is
-that they feel that because they know and are familiar with the large portions
-of the 70% and they can use portions of the 20% fairly quickly,
-they then feel that they "know" the language.  This happened to me.
+These weights of course are subjective and I provide them only to
+make another point. What frequently confuses people coming to Swift from 
+other OO languages is that they feel that because they know and are familiar 
+with the large portions of the 70% and they can use portions of the 20% fairly
+quickly, they then feel that they "know" the language.  This happened to me.
 And I was wrong.
 
 This workspace covers the 70% and portions of the 20% in Playgrounds 1-25.
