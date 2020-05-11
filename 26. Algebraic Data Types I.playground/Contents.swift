@@ -348,7 +348,7 @@ struct ThreeTimesTwo {
     var three: Three
     var two: Bool
 }
-/*
+/*:
  You can work out the values there for yourself.
  
  I could do a five-valued type as:
