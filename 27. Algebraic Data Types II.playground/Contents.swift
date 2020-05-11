@@ -15,8 +15,11 @@
  7. Tuples are structural types (called compound types in the apple doc)
  8. Functions can take as arguments and return either
  nominal or structural types but they themselves are structural types
- 9. Void is the type inhabited by only one value
- 10. Never is the type inhabited by zero values
+ 9. Multi-argument functions are in one-to-one correspondence
+ with their curried form and can be mechanically converted to
+ the curried form and back
+ 10. Void is the type inhabited by only one value
+ 11. Never is the type inhabited by zero values
  
  All of this constitutes what I call the arithmetic of types.
  
@@ -51,7 +54,9 @@
  values of a given type _must_ be known before
  you are allowed to run your code.  This in turn means that every type
  must be completely specified when you compile your code, and no type
- your code will use can be left incompletely specified.
+ your code will use can be left incompletely specified.  Additionally,
+ nominal types must have their entire set of functions known by the
+ time you get to runtime as well.
  
  The most numerous and frustrating errors you will get
  from the compiler are in fact those that tell you that you have
@@ -201,13 +206,20 @@ func powerOfTypes<X, Y>(y: Y) -> X? {
  The big use of nominal types is to be able to distinguish types
  which have the exact same structure from each other i.e. to
  give them separate namespaces.  Why would be need separate namespaces?
- because we want to give different behavior to each named type.
- This is precisely what it means to be Object Oriented.
+ Because we want to give different behavior to each named type.
+ This is precisely what it means to be "Object Oriented".
  
- The way this works in Swift is that for the nominal types (struct, enum, and class),
- we can can declare "extensions".  Extensions have functions
- that are assigned to that type's namespace.  Here's an
- example:
+ Well, ok, OOP is more completely defined by the ideas of polymorphism
+ and encapsulation.  (Note, I am _NOT_ including inheritance in that
+ list as a fundamental aspect of OO because inheritance is really just
+ a technique for achieving polymorphism).  Swift's approach to achieving
+ encapsulation and polymorphism is to use the namespace created for
+ nominal type to assign a function as belonging to the type.
+ 
+ It does this by allowing the declaration of "extensions".
+ Extensions contain the functions that are assigned to that
+ type's namespace.  You can have as many of them as you like
+ and any nominal type can be extended. Here's an example:
  */
 extension Int {
     static var someString: String { "Made up string" }
@@ -273,7 +285,7 @@ extension Int {
  Ok, it feels really good to have gotten that off my chest.  Let me explain
  what I mean by it.
  
- We'll start by explaining the idea of `existential` types. Here's one:
+ We'll start by explaining the idea of "existential" types. Here's one:
  */
 protocol AlternativeCustomStringConvertible {
     var description: String { get }
@@ -282,7 +294,7 @@ protocol AlternativeCustomStringConvertible {
 /*:
  This looks a lot like a struct doesn't it?  That's because it is.
  
- What the compiler does with that code is, unbeknownst to you, to
+ What the compiler does with that code, unbeknownst to you, is to
  create a struct that looks like this:
  */
 struct _AlternativeCustomStringConvertible {
@@ -305,7 +317,8 @@ struct MyAlternativeCustomStringConvertible {
 /*:
  If MyAlternativeCustomStringConvertible had more fields we would
  see that the cardinality of MyAlternativeCustomStringConvertible
- is guaranteed to be a integer multiple of _AlternativeCustomStringConvertible.
+ is guaranteed to be an integer multiple of the cardinality of
+ _AlternativeCustomStringConvertible.
  
  This is exactly the kind of thing the compiler
  does whenever you declare a struct anyway, it's a completely
@@ -431,11 +444,12 @@ extension MyAlternativeCustomStringConvertible {
  
 ### Protocols as Type Constraints
  
- But protocols get used in another way.  They are used to allow us
- on generic types and functions to say abstract away types.  We can
+ But protocols get used in another way.  They are used to allow us,
+ on generic types and functions, to restrict what types can be
+ passed into the generic.  We can
  _"constrain"_ the types in a generic to be, not just any type, but
- a type with a particular cardinality and set of functions in its
- namespace.  Quoting Joe Groff again:
+ a type with a particular cardinality _and set of functions in its
+ namespace_.  Quoting Joe Groff again:
  
  _Generics provide type-level abstraction: they allow a function or
  type to be used uniformly with any type that conforms to a given
@@ -463,16 +477,29 @@ extension MyAlternativeCustomStringConvertible {
  the type syntax (compile time) with a value syntax (run time)
  concept.
  
- <opinion>
+ *_Opinion_*
+ 
  And _that_ is where they messed up.  They overloaded
  the syntax for generic type constraints in a clumsy manner that
  is really inconsistent with the rest of the syntax for generics.
- This is hard to teach and hard to understand.  What you are
+ This makes it hard to teach and hard to understand.
+ 
+ What you are
  doing with type constraints is algebraically equivalent to asking
- the compiler to solve a quadratic equation.  It really doesn't
- have anything to do with holding heterogeneous objects in a
- collection
- </opinion>
+ the compiler to solve a quadratic equation, i.e. you aren't
+ saying, just evaluate the "type-function" for a given type,
+ you are saying _solve_ this system of "type-functions" and
+ tell me if there is no solution. And the compiler will
+ do exactly that as an error message.  And none of that really
+ has anything to do with holding heterogeneous objects in a
+ collection or performing other value-level abstractions.
+ 
+ *_/Opinion_*
+ 
+ By the way, when Joe talks about value-level vs type-level, this
+ is well-approximated by thinking in terms of compile time vs
+ run time.  Things at the value level happen at run time, things
+ at the type level happen at compile time.
  
  Back to quoting Joe:
  

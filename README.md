@@ -574,6 +574,7 @@ It’s not possible to write map because you can’t add the generic type which 
 ### Introductory Functional Programming
 
 * The classic John Hughes paper on [Why Functional Programming Matters](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf):
+* [Statically vs Dynamically Typed Systems](https://lexi-lambda.github.io/blog/2020/01/19/no-dynamic-type-systems-are-not-inherently-more-open/)
 * Pointfree's free episodes (personally I recommend you pay for a subscription):
   * [Functions](https://www.pointfree.co/episodes/ep1-functions)
   * [Side Effects](https://www.pointfree.co/episodes/ep2-side-effects)
@@ -586,7 +587,7 @@ It’s not possible to write map because you can’t add the generic type which 
   * [The Combine Framework and Effects: Part 1](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-1)
   * [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
   * [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
-* [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
+ * [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
 
 ### Generic Programming and Higher Kinded Types
 
