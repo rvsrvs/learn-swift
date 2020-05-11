@@ -1,10 +1,10 @@
 /*:
  # Algebraic Data Types I - Arithmetic of Types
  
- NB In this playground we are experimenting with types.  There aren't any calls
- to function, but in a few places you'll want to have run the playground
- so that you can see the types over on the right.  So don't forget
- to do that.
+ NB In this playground we are experimenting with types.  There aren't
+ many actual calls to functions, but in a few places you'll want to
+ have run the playground so that you can see the types of things printed
+ over on the right. So don't forget to hit run at least once.
 
  ### Types are sets of identifiable objects
  
