@@ -1,6 +1,25 @@
 /*:
  # Algebraic Data Types II - Algebra with Types
  
+ Quick review, we saw the following things in the previous
+ playground:
+ 
+ 1. Types are "bags of values" where we can say what
+ values are in, what values are out and we can distinguish each
+ value unambiguously from each other value.
+ 2. We can determine the cardinality of any of our types
+ 3. Structs and tuples are product types
+ 4. Enums are sum types
+ 5. Functions are themselves types and in particular are exponential types
+ 6. Structs and enums are nominal types
+ 7. Tuples are structural types (called compound types in the apple doc)
+ 8. Functions can take as arguments and return either
+ nominal or structural types but they themselves are structural types
+ 9. Void is the type inhabited by only one value
+ 10. Never is the type inhabited by zero values
+ 
+ All of this constitutes what I call the arithmetic of types.
+ 
  ### The Meaning of Generics
  
  Ok so we have arithmetic of types.  We can add them, multiply them
@@ -42,8 +61,10 @@
  but you'll have to understand what you are doing to make sense of
  what it is telling you.
  
+ ### Static vs Dynamic (Yes, lets poke the hornets nest)
+ 
  Given that other languages allow types to be determined at runtime
- this seems like it's too restrictive, i.e. that other languages can
+ this seems like it's too restrictive, i.e. other languages seem to be able to
  do things that Swift can't.  So why does Swift do it that way? What's
  the point?
  
@@ -80,6 +101,11 @@
  way. Fighting the compiler to let you use dynamic types is a losing
  proposition.
  
+ Just as a side note [here's one of my favorite write ups
+ on the difference](https://lexi-lambda.github.io/blog/2020/01/19/no-dynamic-type-systems-are-not-inherently-more-open/).
+ It's about Haskell vs JavaScript but all the same arguments apply
+ around Swift.
+ 
  ### Using Generics
  
  Lets extend our Optional example from above.
@@ -100,15 +126,13 @@ enum Optional<T> {
  so for Optional to play the role of adding one additional value,
  it needed to be an enum.
  
- Understanding the above
- is one of the places where nominal typing can obscure some
+ This formulation of Optional is one of the places where nominal typing can obscure some
  really important insights.  People coming to Swift from ObjC or
  another language without a reasonably complete system of ADT's
  will look at Optional and think: "This is just their way of avoiding
- segfaults for NULL values".  Well, yes, it is.
- But it's actually
- much more.  It's a very general way of incrementing types.  And
- that functionality is so important that it has been given special
+ segfaults for NULL values in my nominal types".  Well, yes, it is.
+ But it's actually much more.  It's a very general way of incrementing
+ types.  And that functionality is so important that it has been given special
  syntax and a specific nominal type in the language.
  
  Let's do some more examples.  Suppose I wanted to express the
@@ -119,7 +143,7 @@ struct Mult<X> {
     var y: Bool
 }
 /*:
- Algebraically, that:
+ Algebraically, that is saying:
  
      f(x) = 2x
  
@@ -154,15 +178,15 @@ func powerOfTypes<X, Y>(y: Y) -> X? {
     .none
 }
 /*:
- I could have done x^y, but then I'd need figure out
- how to fill in the function.
+ (I could have done x^y, but then I'd need figure out
+ how to fill in the function.)
  
  So look at Generics and think: function of types.
  Swift helps you with this, because even the syntax
  is reminiscent of function: `Optional<T>` just
  _looks_ as if we are passing a T to a function.
  
- ### The meaning of "object"
+ ### Another Digression: The meaning of "object"
  
  Up to now, we haven't talked about "objects"
  or "classes". We've only talked about types and the functions
@@ -180,8 +204,7 @@ func powerOfTypes<X, Y>(y: Y) -> X? {
  because we want to give different behavior to each named type.
  This is precisely what it means to be Object Oriented.
  
- The way this works in Swift
- is that for the nominal types (struct, enum, and class),
+ The way this works in Swift is that for the nominal types (struct, enum, and class),
  we can can declare "extensions".  Extensions have functions
  that are assigned to that type's namespace.  Here's an
  example:
@@ -280,7 +303,7 @@ struct MyAlternativeCustomStringConvertible {
     var alternativeDescription: String
 }
 /*:
- If `MyAlternativeCustomStringConvertible` had more fields we would
+ If MyAlternativeCustomStringConvertible had more fields we would
  see that the cardinality of MyAlternativeCustomStringConvertible
  is guaranteed to be a integer multiple of _AlternativeCustomStringConvertible.
  
@@ -379,9 +402,10 @@ extension MyAlternativeCustomStringConvertible {
      let xyz: [Collection] = [x, y, z]
  
  So Swift uses the existential type functionality described above to
- allow you to fold many types into one type.
+ allow you to fold many types into one type and that allows you
+ to put them in, for example arrays as in Joe's example above.
  
- Thinking in terms of cardinality, saying above:
+ Thinking in terms of cardinality, saying what we said above, i.e. :
  
      extension MyAlternativeCustomStringConvertible: AlternativeCustomStringConvertible { }
  
@@ -401,16 +425,78 @@ extension MyAlternativeCustomStringConvertible {
  
  _which is notationally clearer and more concise than the generic form._
  
+ By the way this is the mechanism that allows you to have
+ "protocol extensions" in the first place.  There is a real type
+ that can be extended and that is what the extension does.
+ 
 ### Protocols as Type Constraints
  
- This type conflation gets leveraged into another use as well.
- It replaces what we do with inheritance.
+ But protocols get used in another way.  They are used to allow us
+ on generic types and functions to say abstract away types.  We can
+ _"constrain"_ the types in a generic to be, not just any type, but
+ a type with a particular cardinality and set of functions in its
+ namespace.  Quoting Joe Groff again:
  
- And, it can be used as a TYPE CONSTRAINT on structs, replacing
- all the stuff we used to with inheritance.
+ _Generics provide type-level abstraction: they allow a function or
+ type to be used uniformly with any type that conforms to a given
+ set of constraints, while still preserving the identity of the specific
+ type being used in any particular instance. A generic function introduces
+ type variables that stand in for a specific type. This allows a function
+ to declare that it accepts any value conforming to a protocol, such as
+ any Collection type:_
+
+     func foo<T: Collection>(x: T) { ... }
  
- <opinion> And _that_ is where they messed up.  They overloaded the syntax for generic
- type constraints in a clumsy manner that is really inconsistent with the
- rest of the syntax for generics.</opinion>
+ _The type variable T abstracts away the specific Collection being
+ operated on at the type level; the identity of the type is still
+ preserved, and so the type system can preserve type relationships
+ between different values. For example, a generic function can also
+ declare that it accepts any two values of the same collection type,
+ and returns an array whose elements are of that same type:_
+
+     func bar<T: Collection>(x: T, y: T) -> [T] { ... }
  
+ Above whe we discussed existential types we were talking about
+ a type that could be used at run time.  But here we're talking
+ about Swift using that type at _compile_ time.  And remember,
+ never the twain shall meet.  So syntactically, we have overloaded
+ the type syntax (compile time) with a value syntax (run time)
+ concept.
+ 
+ <opinion>
+ And _that_ is where they messed up.  They overloaded
+ the syntax for generic type constraints in a clumsy manner that
+ is really inconsistent with the rest of the syntax for generics.
+ This is hard to teach and hard to understand.  What you are
+ doing with type constraints is algebraically equivalent to asking
+ the compiler to solve a quadratic equation.  It really doesn't
+ have anything to do with holding heterogeneous objects in a
+ collection
+ </opinion>
+ 
+ Back to quoting Joe:
+ 
+ _We gave existential types an extremely lightweight spelling,
+ just the bare protocol name, partially following the example
+ of other languages like Java and C# where interfaces also
+ serve as value-abstracted types, and partially out of a hope
+ that they would "just work" the way people expect; if you want
+ a type that can hold any type conforming to a protocol, just
+ use the protocol as a type, and you don't have to know what
+ "existential" means or anything like that. In practice, for a
+ number of reasons, this hasn't worked out as smoothly as we
+ had originally hoped. Although the syntax strongly suggests that
+ the protocol as a constraint and the protocol as a type are one
+ thing, in practice, they're related but different things, and
+ this manifests most confusingly in the "Protocol (the type) does
+ not to conform to Protocol (the constraint)" error. To some degree
+ this is a missing feature in the language, but in cases with
+ nontrivial Self or associated type constraints, a protocol existential
+ simply can't conform to its own protocol._
+ 
+ Read that again.  In some cases you can get an error saying
+ that a protocol doesn't conform to itself?  Joe's document
+ is an excellent road map for where generics and type constraints
+ and existential objects are going, but stay tuned for future
+ developments.
  */

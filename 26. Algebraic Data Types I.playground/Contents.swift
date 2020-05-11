@@ -541,6 +541,17 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  that in effect allows them to be the basis of our
  algorithms.
  
+ ### Are functions structural or nominal?
+ 
+ You sort of already know this, but you probably haven't thought
+ about it.  Functions have to be structural types for the same
+ reason that tuples have to: the entire type inference system of
+ swift depends on it.  For functions to be substitutable as freely
+ in type inference as they are, the inference engine can only
+ rely on the structure of the function.  In fact, while you can
+ name individual functions, there is not mechanism in Swift
+ that would allow you to name a type signature.
+ 
  ### "Higher Order" Functions
  
  So if functions are types does that mean that I can
