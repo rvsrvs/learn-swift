@@ -28,7 +28,7 @@
  1. Each type with identical cardinality is in some sense the same type.
  2. What I mean by this is that I can mechanically convert from one
  type to another and back, paying attention only to the values in the type and not
- any of the relationships between that values that you might think of as existing.
+ any of the relationships between those values other than equality/identity.
  3. So one way that we can classify types is by their cardinality.
  
  Our goal in this playground is to show that Swift lets us build up types with
