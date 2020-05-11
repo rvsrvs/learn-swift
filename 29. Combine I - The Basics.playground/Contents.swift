@@ -102,7 +102,7 @@ r1
  return different _types_ of publisher, which is not the case with
  the operations on Array).
  
- ### Functional Comoposition in Combine
+ ### Functional Composition in Combine
  
  So where does functional composition come in?  The best way to
  understand it is to try and write a mini version of Combine yourself.
@@ -268,7 +268,8 @@ type(of: p1)
  
  Feel free to read that paragraph again, too.  I'll wait.
  
- And just for completeness we see that we get an AnyCancellable back here as well. And that everything works like before.
+ And just for completeness we see that we get an `AnyCancellable`
+ back here as well. And that everything works like before.
  */
 let c1a = p1.sink { r2.append($0) }
 type(of: c1a)

@@ -711,7 +711,7 @@ type(of: d2)
  expression with the `?`'s on
  the right is just syntactic sugar for the following:
  */
-let d3 = a.b.flatMap { $0.c }.flatMap { $0.value }
+let d3 = a.b.flatMap(\.c).flatMap { $0.value }
 d3
 type(of: d3)
 /*:

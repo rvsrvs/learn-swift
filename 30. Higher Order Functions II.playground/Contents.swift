@@ -106,7 +106,8 @@ let f = [Int].myCompactMap
           [String]
 ```
  Again, to emphasize, to correctly state the type of `f`, you have to
- say _all_ of that.
+ say _all_ of that, in that order somehow phrasing the parens,
+ perhaps with air-quotes.
  
  The common mistake that almost everyone makes is
  this: because you "know" that what this function does is take
