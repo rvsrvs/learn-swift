@@ -1,3 +1,4 @@
+import Foundation
 /*:
  # Algebraic Data Types II - Algebra with Types
  
@@ -18,10 +19,11 @@
  9. Multi-argument functions are in one-to-one correspondence
  with their curried form and can be mechanically converted to
  the curried form and back
- 10. Void is the type inhabited by only one value
- 11. Never is the type inhabited by zero values
+ 10. Order of arguments to a function does not break currying
+ 11. Void is the type inhabited by only one value
+ 12. Never is the type inhabited by zero values
  
- All of this constitutes what I call the arithmetic of types.
+ All of this constitutes gives us an arithmetic of types.
  
  ### The Meaning of Generics
  
@@ -131,11 +133,12 @@ enum Optional<T> {
  so for Optional to play the role of adding one additional value,
  it needed to be an enum.
  
- This formulation of Optional is one of the places where nominal typing can obscure some
- really important insights.  People coming to Swift from ObjC or
+ This formulation of Optional is one of the places where nominal typing
+ can obscure some really important insights. Because the class is named
+ "Optional" people coming to Swift from ObjC or
  another language without a reasonably complete system of ADT's
  will look at Optional and think: "This is just their way of avoiding
- segfaults for NULL values in my nominal types".  Well, yes, it is.
+ segfaults for NULL values in my types".  Well, yes, it is.
  But it's actually much more.  It's a very general way of incrementing
  types.  And that functionality is so important that it has been given special
  syntax and a specific nominal type in the language.
@@ -191,6 +194,35 @@ func powerOfTypes<X, Y>(y: Y) -> X? {
  is reminiscent of function: `Optional<T>` just
  _looks_ as if we are passing a T to a function.
  
+  ### Structural -> Nominal types and back
+  
+  It's always been possible to go back and forth between tuples
+  and structs.  Simply create an init on a struct that takes a tuple
+  and a var that provides it back.  But it was not possible to do the
+  same with functions.
+  
+  As of Swift 5.2 it is possible to embed functions in structs, thereby turning them
+  into nominal types.  We can even do that generically.
+  */
+public struct Func<A, B> {
+    public let call: (A) -> B
+    
+    public init(_ call: @escaping (A) -> B) {
+        self.call = call
+    }
+    
+    func callAsFunction(_ a: A) -> B {
+        call(a)
+    }
+}
+
+let f = Func { (a: Int) in a * 2}
+f(2)
+/*:
+  We will make extensive use of this in a future playground
+  because it allows us to write higher-order functions on
+  functions.
+  
  ### Another Digression: The meaning of "object"
  
  Up to now, we haven't talked about "objects"
@@ -303,7 +335,7 @@ struct _AlternativeCustomStringConvertible {
 }
 /*:
  That type is called the "existential" type.  I'll explain the reasone
- for that naming below in more detail, but you can think of it as proving
+ for that naming below in more detail, but you can think of it as making sure
  that a type which matches the protocol actually exists.
  
  Using what you know about cardinality, you should be able to verify that
@@ -526,4 +558,68 @@ extension MyAlternativeCustomStringConvertible {
  is an excellent road map for where generics and type constraints
  and existential objects are going, but stay tuned for future
  developments.
+ 
+ ### Classes - Reference types
+ 
+ We have covered the entire type system except for one thing.
+ The difference between value and reference types.
+ Without looking at the output on the right, predict
+ what the code below does.
+ */
+struct Wrapped: CustomStringConvertible {
+    var val: String
+    var description: String { val }
+    init(_ val: String) {
+        self.val = val
+    }
+}
+var str = Wrapped("Hello, World!")
+var str2 = str
+str.val = "Hello, S65G!"
+str2
+/*:
+ What's the value of str2? is it Hello, World! or is it Hello, S65G! ?
+ 
+ Let's do another example
+ */
+class WrappedRef: CustomStringConvertible {
+    var val: String
+    var description: String { val }
+    init(_ val: String) {
+        self.val = val
+    }
+}
+var strRef = WrappedRef("Hello, World!")
+var strRef2 = strRef
+strRef.val = "Hello, S65G!"
+strRef2
+/*:
+ Once you understand the difference between those two examples,
+ you know almost everything there is to know about reference
+ types. Certainly you know everything you need to, to use them
+ effectively.
+ 
+ So when are they used effectively?  Sometimes you
+ need a reference type to serve as an anchor to hold an object in
+ place.  In the app we are going to write in this class
+ we will need something to hold the current state of the application
+ so that our UI has a consistent place to look when deciding
+ what data to put on the screen.  That is a perfectly valid
+ use of reference types.
+ 
+ But reference types are like impure functions - you should use them when
+ you need them, but _only_ when you need them.  They should not
+ be the thing you reach for initially when writing code in Swift.
+ And that means that we should _NEVER_ be using the the "I" word,
+ aka inheritance.
+ 
+ Yes, Swift has inheritance and it is implemented on `class`
+ types, but in this class we will never use it and in there is
+ in fact no need to ever use it - contrary to what you may have
+ been taught for the last few decades.  Generics completely
+ replace what has traditionally been the role of inheritance.
+ And are much more powerful and type-safe to boot.
+ 
+ And that concludes our tour of the Swift type system. Now
+ on to using the darn thing.
  */
