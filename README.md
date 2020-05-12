@@ -236,7 +236,7 @@ This point about application state and how it changes over time is the architect
 ## Functional Reactive Programming
 The functional reactive programming (FRP) style as embodied in Combine takes functional decomposition into the asynchronous domain of handling events.  Under FRP you should think of your application as being a collection of functions which are nested in an event loop or loops. In GUI apps that's typically the event loop of the main thread, in server apps, it's the event loop of a worker thread.  
 
-When an event enters the event loop, a function is selected to dispatch the event into. That function is called by passing in 1) the current state of the application AND 2) the new event.  The function returns 3) a tuple composed of the new state of the application and 4) any side-effects to be performed. In this model, ApplicationState is an immutable value type wrapped in a reference type which is mutable.  The old value type is replaced at the end of the event loop by the new value computed by the function the event was dispatched into and any accumulated side-effects are dispatched.
+When an event enters the event loop, a function is selected to dispatch the event into. That function is called by passing in 1) the current state of the application AND 2) the new event.  The function returns 3) a tuple composed of the new state of the application and 4) any side-effects to be performed. In this model, ApplicationState is an immutable value type wrapped in a mutable reference type which is tracks changes of AppState over time.  The old value type is replaced at the end of the event loop by the new value computed by the function the event was dispatched into and any accumulated side-effects are dispatched.
 
 Wrt to side-effects: in this model, side-effects are “pushed to the edge of the world” by cumulating them and executing them at the bottom of the event loop after execution of the event-handling function.   Side-effects can generate new events, which enter the queue of events to be processed.  Some types of side-effects that you can think of include: updating the display, firing a network request, and starting a timer.  
 
@@ -575,7 +575,8 @@ It’s not possible to write map because you can’t add the generic type which 
 
 * The classic John Hughes paper on [Why Functional Programming Matters](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf):
 * [Statically vs Dynamically Typed Systems](https://lexi-lambda.github.io/blog/2020/01/19/no-dynamic-type-systems-are-not-inherently-more-open/)
-* Pointfree's free episodes (personally I recommend you pay for a subscription):
+* The class Scott Wlaschin talk [Functional Design Patterns](https://www.slideshare.net/ScottWlaschin/fp-patterns-buildstufflt) also available [as video](https://www.youtube.com/watch?v=srQt1NAHYC0)
+* Pointfree's free episodes (personally I recommend you pay for a subscription if you are going to be a professional Swift programmer):
   * [Functions](https://www.pointfree.co/episodes/ep1-functions)
   * [Side Effects](https://www.pointfree.co/episodes/ep2-side-effects)
   * [Algebraic Data Types](https://www.pointfree.co/episodes/ep4-algebraic-data-types)
@@ -589,7 +590,7 @@ It’s not possible to write map because you can’t add the generic type which 
   * [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
  * [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
 
-### Generic Programming and Higher Kinded Types
+### Generic Programming and Higher Kinded Types in Swift
 
 * [The Generics Manifesto](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md)
 * A whole series on Higher Kinded types

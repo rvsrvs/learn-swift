@@ -133,4 +133,7 @@
    <FileRef
       location = "group:37. App Architecture I - Principles.playground">
    </FileRef>
+   <FileRef
+      location = "group:38. App Architecture II - Reducers.playground">
+   </FileRef>
 </Workspace>
