@@ -577,17 +577,19 @@ It’s not possible to write map because you can’t add the generic type which 
 * [Statically vs Dynamically Typed Systems](https://lexi-lambda.github.io/blog/2020/01/19/no-dynamic-type-systems-are-not-inherently-more-open/)
 * The class Scott Wlaschin talk [Functional Design Patterns](https://www.slideshare.net/ScottWlaschin/fp-patterns-buildstufflt) also available [as video](https://www.youtube.com/watch?v=srQt1NAHYC0)
 * Pointfree's free episodes (personally I recommend you pay for a subscription if you are going to be a professional Swift programmer):
-  * [Functions](https://www.pointfree.co/episodes/ep1-functions)
-  * [Side Effects](https://www.pointfree.co/episodes/ep2-side-effects)
-  * [Algebraic Data Types](https://www.pointfree.co/episodes/ep4-algebraic-data-types)
-  * [A Tale of Two Flat-Maps](https://www.pointfree.co/episodes/ep10-a-tale-of-two-flat-maps)
-  * [The Many Faces of Zip: Part 3](https://www.pointfree.co/episodes/ep25-the-many-faces-of-zip-part-3)
-  * [SwiftUI and State Management: Part 1](https://www.pointfree.co/episodes/ep65-swiftui-and-state-management-part-1)
-  * [SwiftUI and State Management: Part 2](https://www.pointfree.co/episodes/ep66-swiftui-and-state-management-part-2)
-  * [SwiftUI and State Management: Part 3](https://www.pointfree.co/episodes/ep66-swiftui-and-state-management-part-3)
-  * [The Combine Framework and Effects: Part 1](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-1)
-  * [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
-  * [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
+    * [Functions](https://www.pointfree.co/episodes/ep1-functions)
+    * [Side Effects](https://www.pointfree.co/episodes/ep2-side-effects)
+    * [Algebraic Data Types](https://www.pointfree.co/episodes/ep4-algebraic-data-types)
+    * [A Tale of Two Flat-Maps](https://www.pointfree.co/episodes/ep10-a-tale-of-two-flat-maps)
+    * [The Many Faces of Zip: Part 3](https://www.pointfree.co/episodes/ep25-the-many-faces-of-zip-part-3)
+    * [SwiftUI and State Management: Part 1](https://www.pointfree.co/episodes/ep65-swiftui-and-state-management-part-1)
+    * [SwiftUI and State Management: Part 2](https://www.pointfree.co/episodes/ep66-swiftui-and-state-management-part-2)
+    * [SwiftUI and State Management: Part 3](https://www.pointfree.co/episodes/ep66-swiftui-and-state-management-part-3)
+    * [The Combine Framework and Effects: Part 1](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-1)
+    * [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
+    * [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
+    * [The Composable Architecture, Part I](https://www.pointfree.co/episodes/ep100-a-tour-of-the-composable-architecture-part-1)
+    * [The Composable Architecture, Part II](https://www.pointfree.co/episodes/ep101-a-tour-of-the-composable-architecture-part-2)
  * [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
 
 ### Generic Programming and Higher Kinded Types in Swift
@@ -618,7 +620,7 @@ It’s not possible to write map because you can’t add the generic type which 
 
 ### Swift Mechanics
 * [Swift Method Dispatch](https://www.rightpoint.com/rplabs/switch-method-dispatch-table)
-* [Witnesses](https://medium.com/@vhart/protocols-generics-and-existential-containers-wait-what-e2e698262ab1)
+* [Witnesses instead of protocols](https://medium.com/@vhart/protocols-generics-and-existential-containers-wait-what-e2e698262ab1)
 * [Trampolines as a means of coping with really deep recursion](https://www.uraimo.com/2016/05/05/recursive-tail-calls-and-trampolines-in-swift/)
 * [The new objc_msgSend](https://www.mikeash.com/pyblog/objc_msgsends-new-prototype.html)
 * [OSSA improvements](https://twitter.com/johannesweiss/status/1205812075005665281) to the SIL
@@ -628,3 +630,7 @@ It’s not possible to write map because you can’t add the generic type which 
 * [https://swiftwithmajid.com](https://swiftwithmajid.com)
 * [https://swiftui-lab.com](https://swiftui-lab.com)
 * [https://developer.apple.com/tutorials/swiftui/tutorials](https://developer.apple.com/tutorials/swiftui/tutorials)
+
+### App Architecture
+* [The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture)
+
