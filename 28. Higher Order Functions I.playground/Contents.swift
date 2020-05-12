@@ -363,7 +363,7 @@ type(of: fm3)
  Interestingly, `String` conforms to the `Sequence` protocol, i.e. it is a
  `Sequence` of `Character`s.  Let's demonstrate what flatMap does to that.
  */
-let s = "abc, 123, baby you and me"
+let s = "abc,123"
 let aOfs = s.flatMap { $0 }
 aOfs
 /*:
