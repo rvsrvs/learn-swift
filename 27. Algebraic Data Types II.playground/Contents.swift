@@ -205,6 +205,8 @@ func powerOfTypes<X, Y>(y: Y) -> X? {
   into nominal types.  We can even do that generically.
   */
 public struct Func<A, B> {
+    var x = 10
+    var y = 24.0
     public let call: (A) -> B
     
     public init(_ call: @escaping (A) -> B) {

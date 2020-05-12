@@ -84,7 +84,7 @@ struct BoolWrapper {
 var bw1 = BoolWrapper(b: true)
 var bw2 = BoolWrapper(b: false)
 /*:
- Don't believe me?  Show me another value of BoolWrapper than
+ Don't believe me?  Show me another value of BoolWrapper
  besides those two.
  
  How many values are there in the following struct:
@@ -147,8 +147,9 @@ struct BoolLittleInt {
 
  Hence `struct`s are called (tah dah) Product types.
  
- So here's a question. Why can't I make a struct with a
- number of values that is not a power of 2?  Hold that thought
+ So here's a question. If all I can do is add one bit
+ at a time, can I make a struct with a
+ number of values that is _not_ a power of 2?  Hold that thought
  while we talk about something else for bit.
  
  ### Tuples as Product types
@@ -174,7 +175,8 @@ struct BoolLittleInt {
  
  Swift has both. In Swift, structural types cannot have names, structure alone
  specifies the type.  Nominal types in Swift have to have unique names and
- only things of the same named type can be interchanged.  Structural types
+ only things of the same named type can be interchanged.
+ Structural _product_ types (there are structural types in Swift that aren't products)
  are called `tuples` and are in fact the type that is passed to functions.
  They can of course also be passed back, they're just types after all.
  Both tuples and structs are product types, though.
@@ -422,7 +424,8 @@ enum BoolPlusOne {
  _A function takes a single value of a specified type and returns a
  single value of a specified type._
  
- The returned type can be the same type or a different type,
+ The returned type can be the same type or a different
+ type than the input type,
  but both the input type and the returned type must be
  specified in advance: i.e. a function doesn't get to change its
  mind about what it returns after you have invoked it.
@@ -549,7 +552,7 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  swift depends on it.  For functions to be substitutable as freely
  in type inference as they are, the inference engine can only
  rely on the structure of the function.  In fact, while you can
- name individual functions, there is not mechanism in Swift
+ name individual functions, there is no mechanism in Swift
  that would allow you to name a type signature.
  
  ### "Higher Order" Functions
@@ -720,8 +723,7 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  Interestingly, and this is a desirable property of using
  a structural type, the way of referring to the type and the
  value are identical.  Both are called `()` and which one is
- meant at any given point in Swift code at any given point
- is determined by context.
+ meant at any given point in your code is determined by context.
  
  So, I've made a bunch of assertions about this one-valued type
  thing, do they really check out? Let's see.
@@ -771,7 +773,7 @@ enum ThreeVoid {
  ### Never as the _real_ Void type
  
  So Void is the type with just one value, can you think of type with zero values?
- This one is a bit more tricky.  it doesn't map onto anything from C-based languages.
+ This one is a bit trickier.  it doesn't map onto anything from C-based languages.
  There is one in Swift, though, it's called Never.  And this is how it is defined:
  */
 enum Never { }
