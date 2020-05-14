@@ -32,31 +32,6 @@ public func cons<T>(_ t: T) -> () -> T { { t } }
 public func unwrap<T>(_ t: T?) -> T { t! }
 
 /*:
- Define a struct which wraps a function
- underneath and meets the above protocol.
- */
-public struct Func<FA, FB>: CallableAsFunction {
-    public typealias A = FA
-    public typealias B = FB
-    public let call: (FA) -> FB
-    
-    public init(_ call: @escaping (FA) -> FB) {
-        self.call = call
-    }
-    
-    public init(_ f: Func<A, B>) {
-        self.call = f.call
-    }
-    
-    public init<C>(_ f: @escaping (A) throws -> C) where B == Result<C, Error> {
-        self = .init {
-            do { return .success(try f($0)) }
-            catch { return .failure(error) }
-        }
-    }
-}
-
-/*:
  Various forms of mixing plain functions with Funcs
  */
 func >>> <A, B, C, D: CallableAsFunction> (
@@ -71,13 +46,6 @@ func >>> <A, B, C, D: CallableAsFunction>(
     _ g: @escaping (B) -> C
 ) -> Func<A,C> where D.A == A, D.B == B {
     .init(f.call >>> g)
-}
-
-func >>> <A, B, C, D: CallableAsFunction, E: CallableAsFunction> (
-    _ f: D,
-    _ g: E
-) -> Func<A,C> where D.A == A, D.B == B, E.A == B, E.B == C{
-    .init(f.call >>> g.call)
 }
 
 public func |> <A, B, C: CallableAsFunction> (a: A, f: C) -> B
@@ -148,21 +116,6 @@ public protocol CallableAsFunction {
         _ f:  @escaping (C) -> A,
         _ g:  @escaping (B) -> D
     ) -> Func<C, D>
-
-    func dimap<C, D>(
-        _ f:  Func<C, A>,
-        _ g:  @escaping (B) -> D
-    ) -> Func<C, D>
-
-    func dimap<C, D>(
-        _ f:  @escaping (C) -> A,
-        _ g:  Func<B, D>
-    ) -> Func<C, D>
-
-    func dimap<C, D>(
-        _ f:  Func<C, A>,
-        _ g:  Func<B, D>
-    ) -> Func<C, D>
 }
 
 public extension CallableAsFunction {
@@ -207,8 +160,6 @@ public extension CallableAsFunction {
     func flatMap<C>(
         _ f: Func<B, Func<A, C>>
     ) -> Func<A, C> {
-        // self >>> f = ((A) -> B) >>> (B) -> (A) -> C = (A) -> (A) -> C
-        // a |> (self >>> f) = (A) -> C
         .init { (a: A) in  a |> (a |> (self >>> f)) }
     }
 
@@ -226,9 +177,6 @@ public extension CallableAsFunction {
         _ join:  @escaping (Self) -> Self,
         _ transform:@escaping (C) -> A
     ) -> Func<C, B> {
-        // self |> join = (A -> B) |> ((A) -> B) -> (A) -> B) = A -> B
-        // transform >>> (self |> join)
-        // = (C -> A) >>> (A -> B) = C -> B
         transform >>> (self |> join)
     }
     
@@ -236,9 +184,6 @@ public extension CallableAsFunction {
         _ join:  @escaping ((A) -> B) -> (A) -> B,
         _ transform: Func<C, A>
     ) -> Func<C, B> {
-        // self |> join = (A -> B) |> ((A) -> B) -> (A) -> B) = A -> B
-        // transform >>> (self |> join)
-        // = (C -> A) >>> (A -> B) = C -> B
         transform >>> (self.call |> join)
     }
     
@@ -246,9 +191,6 @@ public extension CallableAsFunction {
         _ join:  Func<Self, Self>,
         _ transform: Func<C, A>
     ) -> Func<C, B> {
-        // self |> join = (A -> B) |> ((A) -> B) -> (A) -> B) = A -> B
-        // transform >>> (self |> join)
-        // = (C -> A) >>> (A -> B) = C -> B
         transform >>> (self |> join)
     }
     
@@ -259,29 +201,30 @@ public extension CallableAsFunction {
         // C -> A >>> A -> B >>> B -> D = C -> D
         hoist >>> self >>> lower
     }
+}
 
-    func dimap<C, D>(
-        _ hoist: Func<C, A>,
-        _ lower: @escaping (B) -> D
-    ) -> Func<C, D> {
-        // C -> A >>> A -> B >>> B -> D = C -> D
-        hoist >>> self >>> lower
+/*:
+ Define a struct which wraps a function
+ underneath and meets the above protocol.
+ */
+public struct Func<FA, FB>: CallableAsFunction {
+    public typealias A = FA
+    public typealias B = FB
+    public let call: (FA) -> FB
+    
+    public init(_ call: @escaping (FA) -> FB) {
+        self.call = call
     }
-
-    func dimap<C, D>(
-        _ hoist: @escaping (C) -> A,
-        _ lower: Func<B, D>
-    ) -> Func<C, D> {
-        // C -> A >>> A -> B >>> B -> D = C -> D
-        hoist >>> self >>> lower
+    
+    public init(_ f: Func<A, B>) {
+        self.call = f.call
     }
-
-    func dimap<C, D>(
-        _ hoist: Func<C, A>,
-        _ lower: Func<B, D>
-    ) -> Func<C, D> {
-        // C -> A >>> A -> B >>> B -> D = C -> D
-        hoist >>> self >>> lower
+    
+    public init<C>(_ f: @escaping (A) throws -> C) where B == Result<C, Error> {
+        self = .init {
+            do { return .success(try f($0)) }
+            catch { return .failure(error) }
+        }
     }
 }
 
@@ -299,7 +242,12 @@ public enum Demand {
     case max(Int)
     case unlimited
     case cancel
-
+}
+/*:
+ And you might want to look at a demand and ask
+ how big it is or if it is satisfied.
+ */
+extension Demand {
     var decremented: Demand {
         guard case .max(let value) = self else { return self }
         return value > 1 ? .max(value - 1) : .none
@@ -317,7 +265,6 @@ public enum Demand {
     
     var satisfied: Bool { !unsatisfied }
 }
-
 /*:
  A Demand can be fulfilled with a Supply
  which can be either none, a value of the desired
@@ -354,7 +301,9 @@ public struct Producer<Value, Failure: Error> {
         self.call = call
     }
 }
-
+/*:
+ And of course it's `CallableAsFunction`
+ */
 extension Producer: CallableAsFunction {
     public typealias A = Demand
     public typealias B = Supply<Value, Failure>
@@ -363,7 +312,6 @@ extension Producer: CallableAsFunction {
         self.call = f.call
     }
 }
-
 /*:
  Since we have a function which can produce Supply in
  response to Demand, there must also be a function which
@@ -421,7 +369,9 @@ public struct Subscriber<Value, Failure: Error> {
         self.call = call
     }
 }
-
+/*:
+ And of course Subscribers are CallableAsFunction
+ */
 extension Subscriber: CallableAsFunction {
     public typealias A = Supply<Value, Failure>
     public typealias B = Demand
@@ -430,12 +380,12 @@ extension Subscriber: CallableAsFunction {
         self.call = f.call
     }
 }
-
 /*:
  To get a feel for why this is a contraFlatMap,
  let's see what a function which would implement
  the satiate/exhaust loop for a subscriber/producer
- pair might look like.  Note that the Supply<Value, Failure>
+ pair might look like.  Note that the Producer<Value,Failure>,
+ Subscriber<Value,Failure>, and Supply<Value, Failure>
  types have to match for the pairing to work.
  */
 extension Subscriber {
@@ -523,7 +473,9 @@ public struct Subscription {
         self.init(f.map(void))
     }
 }
-
+/*:
+ Subscription, too, is CallableAsFunction
+ */
 extension Subscription: CallableAsFunction {
     public typealias A = Demand
     public typealias B = Void
@@ -532,8 +484,6 @@ extension Subscription: CallableAsFunction {
         self.init(f.call)
     }
 }
-
-
 /*:
  Finally, we need some way of taking a Producer and a
  Subscriber and creating a Subscription.
@@ -576,7 +526,9 @@ public struct Publisher<Output, Failure: Error> {
         self.call = call
     }
 }
-
+/*:
+ Guess what, CallableAsFunction :)
+ */
 extension Publisher: CallableAsFunction {
     public typealias A = Subscriber<Output, Failure>
     public typealias B = Subscription
@@ -585,7 +537,6 @@ extension Publisher: CallableAsFunction {
         self.call = f.call
     }
 }
-
 /*:
  Summarizing:
  
@@ -622,17 +573,13 @@ extension Publisher: CallableAsFunction {
  We "Combine" these elements using the basic functional
  programming elements as follows:
  
-   On Supply we use:
-     map
+    On Supply we use: map
  
-   And on Subscriber and Subscription we use:
-     contraMap
-     contraFlatMap
+    And on Subscriber and Subscription we use: contraFlatMap
  
-   And on Publisher we use:
-     dimap
+    And on Publisher we use: dimap
  
-   to form a plethora of more complex forms
+ to form a plethora of more complex forms
  
  These are all functions we defined on our Func struct.
  
@@ -746,3 +693,6 @@ public extension Publisher {
         }
     }
 }
+/*:
+ And now we can start writing Combine-like functions
+ */
