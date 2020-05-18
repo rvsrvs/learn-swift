@@ -1,27 +1,16 @@
 /*:
  # Higher Order Functions IV - Contravariance and Combine
 
+ ![Swift Type System](swift-type-system.png)
  */
+import UIKit
+let image = UIImage(named: "swift-type-system")
 
 precedencegroup CompositionPrecedence {
   associativity: right
   higherThan: AssignmentPrecedence
   lowerThan: MultiplicationPrecedence, AdditionPrecedence
 }
-
-infix operator >>>: CompositionPrecedence
-public func >>> <A, B, C>(
-    _ f: @escaping (A) -> B,
-    _ g: @escaping (B) -> C
-) -> (A) -> C {
-    { (a: A) -> C in g(f(a)) }
-}
-
-infix operator |>: CompositionPrecedence
-public func |> <A, B> (
-    a: A,
-    f: (A) -> B
-) -> B { f(a) }
 
 /*:
  Handy functions for composition
@@ -30,6 +19,17 @@ public func identity<T>(_ t: T) -> T { t }
 public func void<T>(_ t: T) -> Void { }
 public func cons<T>(_ t: T) -> () -> T { { t } }
 public func unwrap<T>(_ t: T?) -> T { t! }
+
+/*:
+ Various forms of mixing plain functions with Funcs
+ */
+infix operator >>>: CompositionPrecedence
+public func >>> <A, B, C>(
+    _ f: @escaping (A) -> B,
+    _ g: @escaping (B) -> C
+) -> Func<A, C> {
+    .init { (a: A) -> C in g(f(a)) }
+}
 
 /*:
  Various forms of mixing plain functions with Funcs
@@ -48,10 +48,70 @@ func >>> <A, B, C, D: CallableAsFunction>(
     .init(f.call >>> g)
 }
 
-public func |> <A, B, C: CallableAsFunction> (a: A, f: C) -> B
+func >>> <A, B, C, D: CallableAsFunction, E: CallableAsFunction> (
+    _ f: D,
+    _ g: E
+) -> Func<A,C> where D.A == A, D.B == B, E.A == B, E.B == C{
+    .init(f.call >>> g.call)
+}
+
+/*:
+ Define an operator for the application of a
+ function to a value
+ */
+infix operator |>: CompositionPrecedence
+public func |> <A, B> (
+    a: A,
+    f: (A) -> B
+) -> B {
+    f(a)
+}
+
+public func |> <A, B, C: CallableAsFunction> (
+    a: A,
+    f: C
+) -> B
     where A == C.A, B == C.B {
     f(a)
 }
+
+public func |> <A, B: CallableAsFunction, C: CallableAsFunction> (
+    a: A,
+    f: C
+) -> B
+    where A == C.A, B == C.B {
+    f(a)
+}
+
+public func |> <A: CallableAsFunction, B: CallableAsFunction, C: CallableAsFunction> (
+    a: A,
+    f: C
+) -> B
+    where A == C.A, B == C.B {
+    f(a)
+}
+
+public func |> <A: CallableAsFunction, B, C: CallableAsFunction> (
+    a: A,
+    f: C
+) -> B where A == C.A, B == C.B {
+    f(a)
+}
+
+public func |> <A: CallableAsFunction, B, C, D, E, F: CallableAsFunction> (
+    a: A,
+    f: ((B) -> C) -> (D) -> E
+) -> F where A.A == B, A.B == C, F.A == D, F.B == E {
+    .init(f(a.call))
+}
+
+public func |> <A, B: CallableAsFunction> (
+    a: @escaping (A) -> B,
+    f: @escaping ((A) -> B) -> (B.A) -> B.B
+) -> B {
+    .init(f(a))
+}
+
 /*:
  Allow structs which are callable as functions
  of one value to get all the same operations
@@ -160,7 +220,7 @@ public extension CallableAsFunction {
     func flatMap<C>(
         _ f: Func<B, Func<A, C>>
     ) -> Func<A, C> {
-        .init { (a: A) in  a |> (a |> (self >>> f)) }
+        .init { (a: A) in  a |> (a |> (self.call >>> f)) }
     }
 
     func contraFlatMap<C>(
@@ -170,7 +230,7 @@ public extension CallableAsFunction {
         // self |> join = (A -> B) |> ((A) -> B) -> (A) -> B) = A -> B
         // transform >>> (self |> join)
         // = (C -> A) >>> (A -> B) = C -> B
-        .init(transform >>> (self.call |> join))
+        .init(transform >>> self.call |> join)
     }
     
     func contraFlatMap<C>(
@@ -184,14 +244,14 @@ public extension CallableAsFunction {
         _ join:  @escaping ((A) -> B) -> (A) -> B,
         _ transform: Func<C, A>
     ) -> Func<C, B> {
-        transform >>> (self.call |> join)
+        transform >>> self.call |> join
     }
     
     func contraFlatMap<C>(
         _ join:  Func<Self, Self>,
         _ transform: Func<C, A>
     ) -> Func<C, B> {
-        transform >>> (self |> join)
+        transform >>> (self.self |> join)
     }
     
     func dimap<C, D>(
