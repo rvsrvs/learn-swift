@@ -364,6 +364,8 @@ type(of: fm3)
  `Sequence` of `Character`s.  Let's demonstrate what flatMap does to that.
  */
 let s = "abc,123"
+// The warning message here
+// is a (compiler bug)[https://forums.swift.org/t/swift-is-overly-worried-about-me-mixing-up-flatmap-and-compactmap/19801/10]
 let aOfs = s.flatMap { $0 }
 aOfs
 /*:

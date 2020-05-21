@@ -39,6 +39,7 @@ extension Array {
  can look at its type signature and play with it a bit.
  */
 let f = [Int].myCompactMap
+let fs = [String].myCompactMap
 /*:
  The important thing to learn here is that in the expression:
  `[Int].myCompactMap` we are referring to a specific function.
