@@ -134,14 +134,10 @@ var threeDoubles = [Double](repeating: 3.3, count: 3)
 */
 var anotherThreeDoubles = Array(repeating: 2.5, count: 3)
 /*:
- If you store an array in a constant, it is considered "Immutable"
+ If you store an array in a `let` constant, it is considered "Immutable"
 */
 let immutableArray = ["a", "b"]
 /*:
- In terms of immutability, it's important to consider that the array and its contents are treated
- separately. Therefore, you can change the contents of an immutable array, but you can't change
- the array itself.
-
  We can't change the contents of an immutable array:
 ```
  immutableArray[0] = "b"
@@ -151,9 +147,6 @@ let immutableArray = ["a", "b"]
  immutableArray += "c"
  ```
  ### Arrays are Value Types
-
- Arrays are value types that only copy when necessary, which is only when the array itself
- changes (not the contents.)
 
  Here are three copies of an array:
 */
@@ -168,7 +161,7 @@ a[0] = 42
 b[0]
 c[0]
 /*:
- Now that we've changed a, it should have been copied to its own instance. Let's double-check
+ Now that we've changed a, so it should have been copied to its own instance. Let's double-check
  that only b & c are the same:
 */
 a
