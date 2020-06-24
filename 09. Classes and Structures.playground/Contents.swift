@@ -136,7 +136,7 @@ constantVideoMode.frameRate = 24
  (not a class) does not have any initializers, then Swift will provide a "Memberwise Initializer"
  for us automatically.
 
- Here's what tha memberwise initializer looks like. It's pretty self-explanatory in that it is
+ Here's what that memberwise initializer looks like. It's pretty self-explanatory in that it is
  an initializer that includes one externally named parameter for each property in the structure.
 */
 let vga = Resolution(width: 640, height: 480)
