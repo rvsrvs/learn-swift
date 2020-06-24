@@ -4,7 +4,7 @@
  * Closures are simply anonymous blocks of code.
 
  * They can be passed as parameters to functions much like Function Types. In fact, functions
-   are a jsut special case of closures.  
+   are a just special case of closures.  
  
  * Closures are just anonymous functions.  
  
