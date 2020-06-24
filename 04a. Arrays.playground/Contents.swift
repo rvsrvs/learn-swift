@@ -76,7 +76,7 @@ shoppingList[0] = "Six Eggs"
 
  Here, we replace 3 items with only two, removing an item:
 */
-shoppingList[4...6] = ["Banannas", "Apples"]
+shoppingList[4...6] = ["Bananas", "Apples"]
 /*:
  Or we can replace two items with three, inserting a new item:
 */
@@ -168,7 +168,7 @@ a
 b
 c
 /*:
- The same is true if we mutate the array in other ways (mofify the array's size)...
+ The same is true if we mutate the array in other ways (modify the array's size)...
 */
 b.append(4)
 /*:

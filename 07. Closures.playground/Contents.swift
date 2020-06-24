@@ -4,7 +4,7 @@
  * Closures are simply anonymous blocks of code.
 
  * They can be passed as parameters to functions much like Function Types. In fact, functions
-   are a jsut special case of closures.  
+   are a just special case of closures.
  
  * Closures are just anonymous functions.  
  
@@ -187,7 +187,7 @@ returnValue { 6 }
  The idea of capture is to allow a closure to access the variables and constants in their
  surrounding context.
 
- For example, a nested function can access contstans and variables from the function in which
+ For example, a nested function can access constants and variables from the function in which
  it is defined. If this nested function is returned, each time it is called, it will work within
  that "captured" context.
 

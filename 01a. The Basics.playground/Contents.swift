@@ -242,7 +242,7 @@ Int32.max
  Double is a 64-bit floating point number and Float is a 32-bit floating point number
 */
 let pi: Double = 3.14159
-let pie: Float = 100 // ... becase it's 100% delicious!
+let pie: Float = 100 // ... because it's 100% delicious!
 /*:
 ### Type Safety and Type Inference
 
