@@ -76,7 +76,7 @@ shoppingList[0] = "Six Eggs"
 
  Here, we replace 3 items with only two, removing an item:
 */
-shoppingList[4...6] = ["Banannas", "Apples"]
+shoppingList[4...6] = ["Bananas", "Apples"]
 /*:
  Or we can replace two items with three, inserting a new item:
 */
