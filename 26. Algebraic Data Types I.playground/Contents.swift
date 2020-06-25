@@ -335,7 +335,7 @@ enum TwoPlusTwoPlusTwo {
 /*:
  So in this case I have three values and each value can have
  one of two values in its associated type - giving 6 possible
- values of ThreeByTwo.  Here they all are:
+ values of TwoPlusTwoPlusTwo.  Here they all are:
  */
 var tbt1 = TwoPlusTwoPlusTwo.one(false)
 var tbt2 = TwoPlusTwoPlusTwo.one(true)

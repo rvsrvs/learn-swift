@@ -21,7 +21,7 @@
 
  Use the `let` keyword to define a constant
 */
- let maximumNumberOfLoginAttempts = 10
+ let maximumNumberOfLoginAttempts = 11
 /*:
  Use the `var` keyword to define a variable
 

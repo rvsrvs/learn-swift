@@ -23,7 +23,7 @@ import Foundation
  11. Void is the type inhabited by only one value
  12. Never is the type inhabited by zero values
  
- All of this constitutes gives us an arithmetic of types.
+ All of this constitutes an arithmetic of types.
  
  ### The Meaning of Generics
  
