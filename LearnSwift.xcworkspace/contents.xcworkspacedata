@@ -5,6 +5,9 @@
       location = "group:README.md">
    </FileRef>
    <FileRef
+      location = "group:ToDos.md">
+   </FileRef>
+   <FileRef
       location = "group:01a. The Basics.playground">
    </FileRef>
    <FileRef
@@ -137,6 +140,6 @@
       location = "group:38. App Architecture II - Reducers.playground">
    </FileRef>
    <FileRef
-      location = "group:99. Exercises.playground">
+      location = "group:../../../../Library/Autosave Information/99. Pointfree Style.playground">
    </FileRef>
 </Workspace>

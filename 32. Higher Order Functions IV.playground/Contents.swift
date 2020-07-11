@@ -79,8 +79,9 @@ public func unwrap<T>(_ t: T?) -> T { t! }
    }
  }
 ```
- 
-```
+ */
+
+/*:
  So we see that essentially any of the generics we
  use every day have map and flatMap defined on them.
  
