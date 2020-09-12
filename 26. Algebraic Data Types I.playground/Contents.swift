@@ -283,7 +283,9 @@ enum Hmmm {
  
  Side note: It is a hole in the Swift type system
  that enums are purely nominal.  There is no structural type
- for them.  This has been discussed at length, but there
+ for them.  This has been discussed at length
+ (see [this centithread for example](https://forums.swift.org/t/adding-either-type-to-the-standard-library/36972/84)),
+ but there
  seems to be no appetite on the part of the core team
  for adding a structural version of enums to the language.
  Maybe one day.
@@ -553,7 +555,9 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  in type inference as they are, the inference engine can only
  rely on the structure of the function.  In fact, while you can
  name individual functions, there is no mechanism in Swift
- that would allow you to name a type signature.
+ that would allow you to name a type signature. (At least not in the same
+ way you can name structs and enums.  We'll explore the mechanism
+ that Swift does provide that approximates this later.)
  
  ### "Higher Order" Functions
  
@@ -610,7 +614,7 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  has cardinality of 4^2 or 16.  The trick to calculating
  this is to start at the far right for your value of B
  in B^A and work backwards to the left. (This will explain
- somethings in future playgrounds, btw).
+ some things we'll see in future playgrounds, btw).
  
  So what happens if I add a func type to a struct as a var.
  Yeah, I multiply the cardinality of the struct _before adding
@@ -838,8 +842,9 @@ func neverToNever(_ n: Never) -> Never {
  which don't return as having return type Never.  (It used to require
  that you annotate them with a special compiler flag: `@noreturn`).
  
- (Never) -> B should be B^0 or just 1.  You can write the function only one way,
- and we did.  There's just one problem: you can never call it.
+ (Never) -> B should be B^0 or just 1.  You can write the function plenty of ways,
+ but from the compiler's point of view, they're all equivalent, because
+ you can never call it.
  
  And finally (Never) -> Never is an odd one since it's cardinality is 0^0.
  Turns out that that the limit of x^x as x approaches zero from the right

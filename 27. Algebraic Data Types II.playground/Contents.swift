@@ -504,7 +504,7 @@ extension MyAlternativeCustomStringConvertible {
 
      func bar<T: Collection>(x: T, y: T) -> [T] { ... }
  
- Above whe we discussed existential types we were talking about
+ Above when we discussed existential types we were talking about
  a type that could be used at run time.  But here we're talking
  about Swift using that type at _compile_ time.  And remember,
  never the twain shall meet.  So syntactically, we have overloaded
@@ -531,8 +531,8 @@ extension MyAlternativeCustomStringConvertible {
  *_/Opinion_*
  
  By the way, when Joe talks about value-level vs type-level, this
- is well-approximated by thinking in terms of compile time vs
- run time.  Things at the value level happen at run time, things
+ is well-approximated by thinking in terms of run time vs
+ compile time.  Things at the value level happen at run time, things
  at the type level happen at compile time.
  
  Back to quoting Joe:
