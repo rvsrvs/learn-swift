@@ -24,8 +24,11 @@ I believe that Swift 6, Combine and SwiftUI represent an inflection point where 
 
 _NB_ All code in this project is in commented playgrounds using Apple's Markdown comment formatting specification. So you'll want to do the following in Xcode: `Editor->Show Raw Markup` whenever you open a playground.
 
-One final note: I _highly_ recommend reading or watching pretty much everything in the bibliography attached at the bottom of this document.<br>
-It is impossible in a single work such as this to cover everything in the detail that it deserves, so I've incorporated pointers to things that I particularly liked and found helpful in the biobliography. In particular, I cannot recommend the Pointfree.co video series highly enough. I link below to their free content, but I pay them for a subscription and I recommend doing the same to anyone serious about functional programming in Swift.
+One final note: I _highly_ recommend reading or watching pretty much everything in the bibliography attached at the bottom of this document.
+
+It is impossible in a single work such as this to cover everything in the detail that it deserves, so I've incorporated pointers to things that I particularly liked and found helpful in the bibliography. In particular, I cannot recommend the [Pointfree](https://pointfree.co) video series highly enough. I link below to their free content, but I pay them for a subscription and I recommend doing the same to anyone serious about functional programming in Swift.
+
+Additionally, I keep [A Companion for SwiftUI](https://swiftui-lab.com/companion/) open on my desktop as I work pretty much continuously and it is another tool I strongly recommend.
 
 ## Contributors
 
@@ -51,7 +54,7 @@ Going back to the notion of the language having three parts, I think we can assi
 
 3. the backwards compatibility layer: I would argue that this comprises about 70% of the language.
 
-These weights of course are subjective and I provide them only to make another point. What frequently confuses people coming to Swift from other OO languages is that they feel that because they know and are familiar with the large portions of the 70% and they can use portions of the 20% fairly quickly, they then feel that they "know" the language. This happened to me. And I was wrong.
+These weights of course are subjective and I provide them only to make another point. What frequently confuses people coming to Swift from other OO languages is that they feel that, because they know and are familiar with the large portions of the 70% and they can use portions of the 20% fairly quickly, they then feel that they "know" the language. This happened to me. And I was wrong.
 
 This workspace covers the 70% and portions of the 20% in Playgrounds 1-25\. Knowing all of this syntax is necessary in order read Swift, but it doesn't guide you in how to write it. Playground 26 forward does that.
 
@@ -104,9 +107,11 @@ You will want to pay special attention to familiarizing yourself with the follow
 Current Swift features:
 
 - Types expressible as either value or reference types
-- Sum types as first-class types in addition to Product types
+- Sum types (enums) and Exponential types (functions) captured as first-class types in addition to Product types (structs and classes)
 - Strongly typed, reified, constrained generics
 - Simplified syntax for functional composition techniques
+- Structural types as well as nominal types
+- Strong type inference when using structural types
 
 Coming Swift features:
 
@@ -122,14 +127,14 @@ The community is converging on using the functional programming aspects of Swift
 ### NEVER USE
 
 - for-loops - use Sequence higher-order methods instead
-- while-loops outside of `RunLoops` - in functional reactive systems, there is a while-loop at the top of a RunLoop and all code below that reacts and returns results, no other while loops are needed
+- while-loops outside of `RunLoops` - use trampolines instead.
 - callbacks, delegates, `NotificationCenter`s, or similar constructions - you should replace these with use of Combine Publisher(s) in every case
 - inheritance - replace with a mix of generic wrappers, enums, protocols and protocol witnesses as appropriate,
 - the `throws` keyword in APIs that you design - you should use Result instead. `throw`-ing functions simply do not compose well and hence do not fit well inside a functional code base.
 
 ### NEVER USE OUTSIDE OF MIXED IMPERATIVE/FUNCTIONAL CODEBASES
 
-- functions that return or accept `Void` - Void-returning (or accepting) functions, by construction, can only be used to accompli sh side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with. (For brevity, I'll refer to functions which return _or accept_ Void henceforward as "Void-returning".)
+- functions that return or accept `Void` - Void-returning (or accepting) functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with. (For brevity, I'll refer to functions which return _or accept_ Void henceforward as "Void-returning".)
 - `Array.forEach` -`forEach` is used to perform Void-returning functions on Sequence types. It is itself a Void-returning function and therefore falls under the guideline of things to avoid for both what it does and what it returns. This should be avoided except for instances of interacting with imperative code.
 - `PassthroughSubject` from Combine. You use PassthroughSubject in order to invoke its `send` function, which is a Void-returning function and therefore indicative of an imperative-only interface. In a pure functional codebase this is not needed. It is there to connect the imperative and functional parts of your codebase.
 
@@ -197,7 +202,7 @@ The above ineluctably implies that long-running applications should be organized
  (ApplicationState, Event)->(ApplicationState, [Effect<Action>])
 ```
 
-In functional programming terms, functions with this signature are called reducers. Your application should decompose this function into a chain of function invocations mediated by the type system. If you are working with a mutable ApplicationState, this signature is
+(In Swift terms, the array of effects is actually replaced by a Publisher). In functional programming terms, functions with this signature are called reducers. Your application should decompose this function into a chain of function invocations mediated by the type system. If you are working with a mutable ApplicationState, this signature is
 
 ```
 (&ApplicationState, Event)->[Effect<Action>]
@@ -286,11 +291,17 @@ You will want to:
 - The right association of the `->` operator (i.e. function-accepting-function vs the function-returning-function) distinction is another one of the hardest syntax elements for those new to the language to acquire. Remember that parens are required to force left association if it is needed.
 
 - You can separate any function call which accepts a multi-valued tuple such as `(X, Y, Z) -> A` into a chain of function calls `(X) -> (Y) -> (Z) -> A` where the original function's input tuple is destructured and all of the calls until the last one simply bind the value passed in and return a function which takes the next type. This process is called currying. `curry` is a valid function in Swift.
+
 - You can reverse this via a process called uncurrying. uncurry is also a valid swift function.
+
 - Currying and uncurrying are far more important than you may originally think if you are coming from an OOP background. They illustrate just two of the various function composition techniques available in the language.
+
 - Anytime you see a signature of a function which is curried and which has no side-effects, you can apply a function which can flip the order of any of the arguments without effecting the final result. This should be as intuitive as changing the order of arguments on any multi-valued function call.
+
 - flipping and currying a function's arguments to designate one of the function's arguments as THE object being operated on is the entire basis of OOP. `flip` is also a valid function in Swift.
+
 - OOP in a functional programming setting is purely a notational device designed to enhance programmer intuition. Any functional program can be written in OOP notation, but this is not always the more intuitive means of expression and should be used judiciously.
+
 - In regards to the OOP notation, you should understand the following about functions which are 'methods' associated with enums, structs, classes and protocols:
 
   - Each function you think of as an "instance method" on a type A, taking arguments such as X, Y, and Z and returning B is actually just a static function of the form:
@@ -353,14 +364,23 @@ You will want to:
 - Recognize that `class` exists to provide `struct` with a reference type and is to be used only in that manner. It should NEVER be used to provide additional polymorphism to a struct.
 
 - Accordingly, NEVER use inheritance in your own classes, it's just not how things are done in Swift, and contrary to what you probably think, you don't need it. The polymorphism you seek with inheritance is actually available with other techniques.
+
 - If you think you need a class (and particularly some sort of subclass), almost certainly what you actually need is a generic class that wraps the struct that you _really_ need as its generic type.
+
 - All classes should be marked as final but can accommodate mutating any wrapped values.
+
 - If you think you need inheritance, you definitely need a protocol witness and/or a generic wrapper of some sort.
+
 - Seriously, look at the Swift std library, at SwiftUI, at SwiftNIO, the new Swift Numerics and at Combine. Classes are used only as reference types, inheritance is never used, and every class is marked final to make sure it stays that way.
+
 - Property wrappers have been added to Swift specifically to assist you in not using inheritance.
+
 - Classes should be used only to provide a reference type to a struct. (It should be viewed as a shortcoming of the type system that enums don't have a similar "reference typability").
+
 - By the above, you should use structs wherever possible instead of classes. This can't always be helped, but it _usually_ can.
+
 - Only use classes when you must have a reference type such as when you need to access an instance in multiple threads, or when you will need to perform post-instantiation mutation.
+
 - By default, properties of a struct should be let, not var. Always look to see if you can make something a let and set it at init time rather than just making it a var on the chance that you will want to update it.
 - If you find that you have created a class that only has let properties, it should almost certainly be a struct and not a class
 - Corollary to the use of structs by default: avoid the mutating keyword in structs where possible.
@@ -418,13 +438,21 @@ You will want to:
 - `forEach` is listed last, because its use should be only as a last resort as it returns Void. As mentioned above, void returning functions should be avoided, so its use should be limited to interfacing into legacy imperative code.
 
 - The most common case where `forEach` can't be avoided is walking over collections of UIKit objects to change their state.
+
 - The one other place you might make an exception is where you have a mutating method on a struct for performance reasons.
+
 - The rest of the elements of the list above0] are all frequently used and provide very good practice for using Combine.
+
 - Properly used, the above methods obviate the need to ever use for-loop's. (Really, they do, you don't need the `for` statement, ever).
+
 - map/zip/flatMap are listed first and in that order for a reason, these three have huge applicability in almost every generic you will ever write. You should begin to understand the theory here by practicing on Sequences.
+
 - If you find yourself doing a sequence of maps, compose the mapping functions together and use a single map instead
+
 - Understand how Combine and Sequence are alike and how they are different.
+
 - This is critical - you should NEVER construct an array using the reduce method. Doing so is O(n^2) when there are O(n) options available.
+
 - Any place that you are building up a Collection with a series of append statements, you should look to do that with a static Collection. Due to the fact that Collections in swift are value types, doing it with append (unless you are very careful) ends up requiring quadratic time.
 
 ## Control Flow
@@ -475,10 +503,15 @@ Accordingly, you should work to:
 - In both cases it seems that the limitation is strictly a missing feature of the compiler and I would expect it to be removed in the future
 
 - Don't declare variables as Optional simply to avoid having to initialize them.
+
 - Corollary to this: don't create an object until you have all the values necessary to do so, then create it with the required values. Curried initializers are good for situations where you accumulate the initialization values gradually.
+
 - Sometimes (like in UIViews loaded from storyboards) it is not possible to avoid optionality due to Apple mandating initialization of an optional happening after allocation. This case is a particularly good use of implicit rather than explicit optionality.
+
 - When you do use optionals, try to remove the optionality as soon as possible, I.e. if you find yourself repeatedly using optional chaining on a variable, you should see about removing the optionality sooner. This is especially true of the use [weak self] and self?.
+
 - Related to the previous statement: best practice is to use a guard let self = self construct at the top of [weak self] closures.
+
 - Understand that optional chaining using ? is actually just syntactic sugar over Optional.flatMap. You should work on understanding why that is until it seems intuitive.
 
 ### Result
@@ -541,13 +574,15 @@ map<U>(transform: (T) -> U) -> F<U>
 
 It's not possible to write map because you can't add the generic type which parameterizes the return value. The [Generics Manifesto was recently modified](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md#generic-associatedtypes) to address this and PATs will eventually get generic associated types at which point a pretty good facsimile of higher kinded types will be available in Swift.
 
-- Memory Semantics: Library writers will need to understand the memory semantics coming soon. If that is you, specifically you need to know when move, borrow, and copy apply as described in [The Ownership Manifesto](https://github.com/apple/swift/blob/master/docs/OwnershipManifesto.md) Basically this is what is needed to make Swift fast enough to be a systems programming language to replace C. The memory ownership model is almost completely stolen borrowed from Rust and there's loads of resources out there on the Rust implementation. Since the model is "opt-in" on top of the conservative model Swift has always had under ARC, programmers will have to be aware of these things in order to maximize performance of their code.
+- Memory Semantics: Library writers will need to understand the memory semantics coming soon. If that is you, specifically you need to know when move, borrow, and copy apply as described in [The Ownership Manifesto](https://github.com/apple/swift/blob/master/docs/OwnershipManifesto.md) Basically this is what is needed to make Swift fast enough to be a systems programming language to replace C. The memory ownership model is almost completely stolen (errrrr... borrowed) from Rust and there's loads of resources out there on the Rust implementation. Since the model is "opt-in" on top of the conservative model Swift has always had under ARC, programmers will have to be aware of these things in order to maximize performance of their code.
+
 - ABI Stability -> Module Stability -> Binary compatibility: [How Swift Achieved Dynamic Linking Where Rust Couldn't](https://gankra.github.io/blah/swift-abi/) is absolutely the best explanation I have seen of why all this is important. People writing libraries need to be aware of every detail in it because they will eventually want to implement their own sort of stability. You should also be aware of: <https://swift.org/blog/abi-stability-and-more/> this post as the best explanation of the future direction. And of course there's the [official manifesto itself](https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md)
+
 - Concurrency: Swift lacks a good concurrency model. This keeps it from being a complete system programming language and as this is a core goal of the language we can assume that this is being actively worked on by the core team. We can also assume that the new memory semantics will be the basis on which a new concurrency model is implemented. There's a lot to think about here. Here are some data points:
 
   - the concurrency manifesto that Lattner and Groff were writing: [The Concurrency Manifesto](https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782) seems to have been abandoned. There have been no steps to implementing it taken in Swift 5 and no changes to the document in a long time. It specifies the addition of Async/Await and an Actor model in the language.
   - there was also [a concrete proposal for Async/Await](https://gist.github.com/lattner/429b9070918248274f25b714dcfc7619) by the same authors. It was even tentatively scheduled as a Swift Evolution proposal (i.e. the title of the doc is SE-XXXX). Again, no steps toward implementation in master seem to have been taken.
-  - Apple has been completely silent about open sourcing the Combine framework which has led to numerous open source projects trying to implement an identical solution for use on non-Apple platforms. The silence and failure to include such obviously important APIs in either the Std Lib or in
+  - Apple has been completely silent about open sourcing the Combine framework which has led to numerous open source projects trying to implement an identical solution for use on non-Apple platforms. The silence and failure to include such obviously important APIs in either the Std Lib or in the Unix distributions of Swift could be indicative of major changes coming in this area.
   - The main themes for Swift 6.0 were recently published and those are: expanding Swift to other platforms and taking Concurrency forward. In short, stand-by for major improvements in the handling of asynchronous and concurrent APIs.
   - SwiftNIO is all about concurrency and is built using industry standard techniques. It is very reasonable to presume that support for its techniques will work its way into actual language syntactic support.
 
@@ -557,7 +592,8 @@ It's not possible to write map because you can't add the generic type which para
 
 - The classic John Hughes paper on [Why Functional Programming Matters](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf):
 - [Statically vs Dynamically Typed Systems](https://lexi-lambda.github.io/blog/2020/01/19/no-dynamic-type-systems-are-not-inherently-more-open/)
-- The class Scott Wlaschin talk [Functional Design Patterns](https://www.slideshare.net/ScottWlaschin/fp-patterns-buildstufflt) also available [as video](https://www.youtube.com/watch?v=srQt1NAHYC0)
+- The well-known Scott Wlaschin talk [Functional Design Patterns](https://www.slideshare.net/ScottWlaschin/fp-patterns-buildstufflt) also available [as video](https://www.youtube.com/watch?v=srQt1NAHYC0)
+- [Hillel Wayne on Type-driven modelling](https://www.hillelwayne.com/post/constructive/)
 - Pointfree's free episodes (personally I recommend you pay for a subscription if you are going to be a professional Swift programmer):
 
   - [Functions](https://www.pointfree.co/episodes/ep1-functions)
@@ -571,10 +607,6 @@ It's not possible to write map because you can't add the generic type which para
   - [The Combine Framework and Effects: Part 1](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-1)
   - [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
   - [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
-  - [The Composable Architecture, Part I](https://www.pointfree.co/episodes/ep100-a-tour-of-the-composable-architecture-part-1)
-  - [The Composable Architecture, Part II](https://www.pointfree.co/episodes/ep101-a-tour-of-the-composable-architecture-part-2)
-
-    - [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
 
 ### Generic Programming and Higher Kinded Types in Swift
 
@@ -586,6 +618,11 @@ It's not possible to write map because you can't add the generic type which para
   - [Monad Magic](https://medium.com/@JLHLonline/monad-magic-d355a761e294)
   - [Monad Menagerie](https://medium.com/@JLHLonline/a-monad-menagerie-15e5b96d9ca7)
   - [Non-Swift HKTs](https://www.stephanboyer.com/post/115/higher-rank-and-higher-kinded-types)
+
+- Various discussions on type theory in the Swift context
+
+  - [A Type System from Scratch](https://www.youtube.com/watch?v=IbjoA5xVUq0&feature=youtu.be)
+  - [The meaning of Type Erasure](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
 
 - The Monad and HKT explanation that finally made sense of things for me.
 
@@ -622,10 +659,23 @@ It's not possible to write map because you can't add the generic type which para
 
 ### Swift UI
 
-- <https://swiftwithmajid.com>
-- <https://swiftui-lab.com>
-- <https://developer.apple.com/tutorials/swiftui/tutorials>
+- [Swift with Majid](https://swiftwithmajid.com)
+- [SwiftUI Lab](https://swiftui-lab.com)
+- [Apple Tutorials](https://developer.apple.com/tutorials/swiftui/tutorials)
 
 ### App Architecture
 
 - [The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture)
+- [The Composable Architecture, Part I](https://www.pointfree.co/episodes/ep100-a-tour-of-the-composable-architecture-part-1)
+- [The Composable Architecture, Part II](https://www.pointfree.co/episodes/ep101-a-tour-of-the-composable-architecture-part-2)
+- [The Composable Architecture, Part III](https://www.pointfree.co/episodes/ep102-a-tour-of-the-composable-architecture-part-3)
+- [The Composable Architecture, Part IV](https://www.pointfree.co/episodes/ep103-a-tour-of-the-composable-architecture-part-4)
+
+### Other Comonadic Architectures
+
+- [Elm](https://elm-lang.org)
+- [React/Redux](https://redux.js.org)
+
+### Graphics - Not Swift Specific
+
+- [Affine Transforms](https://www.cs.utexas.edu/users/fussell/courses/cs384g-fall2011/lectures/lecture07-Affine.pdf)
