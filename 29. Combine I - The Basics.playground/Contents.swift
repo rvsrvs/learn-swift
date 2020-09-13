@@ -178,11 +178,11 @@ var r2: [String] = []
  added two new lines.
  */
 let c1 = [1, 2, 3]
-    .publisher
-    .map(doubler)
-    .map(Double.init)
-    .map(\.description)
-    .sink { r2.append($0) }
+    .publisher              // Array<Int>
+    .map(doubler)           // Publishers.Sequence<[Int], Never>
+    .map(Double.init)       // Publishers.Sequence<[Int], Never>
+    .map(\.description)     // Publishers.Sequence<[Double], Never>
+    .sink { r2.append($0) } // AnyCancellable
 /*:
  When we look at `r2` we see its contents are exactly the same as we had before in `r1`
  */
@@ -219,11 +219,11 @@ type(of: c1)
  
  So 3 requirements down, two to go.  Now lets look at what we get from the middle of the chain (annotating the return types.:
  */
-let p1 = [1, 2, 3] // Array<Int>
-    .publisher                                           // Publishers.Sequence<[Int], Never>
-    .map(doubler)                                        // Publishers.Sequence<[Int], Never>
-    .map(Double.init)                                    // Publishers.Sequence<[Double], Never>
-    .map(\.description)                                  // Publishers.Sequence<[String], Never>
+let p1 = [1, 2, 3]      // Array<Int>
+    .publisher          // Publishers.Sequence<[Int], Never>
+    .map(doubler)       // Publishers.Sequence<[Int], Never>
+    .map(Double.init)   // Publishers.Sequence<[Double], Never>
+    .map(\.description) // Publishers.Sequence<[String], Never>
 type(of: p1)
 /*:
  Now this starts to look interesting.  Seems like a Publishers.Sequence is a
@@ -345,10 +345,10 @@ var r3: [String] = []
  */
 let sub1 = PassthroughSubject<Int, Never>()
 let c2 = sub1
-    .map { $0 * 2 }
-    .map { Double($0) }
-    .map { "\($0)" }
-    .sink { r3.append($0) }
+    .map(doubler)
+    .map(Double.init)
+    .map(\.description)
+    .sink { r3.append($0) } // AnyCancellable
 type(of: c2)
 r3
 struct Void { }
@@ -445,14 +445,14 @@ let sub2 = PassthroughSubject<Int, Never>()
  And this time, lets tie TWO chains to the same subject. Note that they do different things.  One makes Strings from the Int that gets input, the other makes Doubles.
  */
 let c3 = sub2
-    .map { $0 * 2 }
-    .map { Double($0) }
-    .map { "\($0)" }
+    .map(doubler)
+    .map(Double.init)
+    .map(\.description)
     .sink { r4.append($0) }
 
 let c4 = sub2
-    .map { $0 * 2 }
-    .map { Double($0) }
+    .map(doubler)
+    .map(Double.init)
     .sink { r5.append($0) }
 /*:
  So, as before we send some values down the pipe.
