@@ -24,10 +24,12 @@ import Combine
  third one be a reduce. Like I said, we're doing map to make the example
  simple).
  */
+func doubler(_ value: Int) -> Int { value * 2 }
+
 let r1 = [1, 2, 3]      // Array<Int>
-    .map { $0 * 2 }     // Array<Int>
-    .map { Double($0) } // Array<Double>
-    .map { "\($0)" }    // Array<String>
+    .map(doubler)       // Array<Int>
+    .map(Double.init)   // Array<Double>
+    .map(\.description) // Array<String>
 r1
 /*:
  This behaves in the way that we've become accustomed to:
@@ -177,9 +179,9 @@ var r2: [String] = []
  */
 let c1 = [1, 2, 3]
     .publisher
-    .map { $0 * 2 }
-    .map { Double($0) }
-    .map { "\($0)" }
+    .map(doubler)
+    .map(Double.init)
+    .map(\.description)
     .sink { r2.append($0) }
 /*:
  When we look at `r2` we see its contents are exactly the same as we had before in `r1`
@@ -217,11 +219,11 @@ type(of: c1)
  
  So 3 requirements down, two to go.  Now lets look at what we get from the middle of the chain (annotating the return types.:
  */
-let p1 = [1, 2, 3]       // Array<Int>
-    .publisher           // Publishers.Sequence<[Int], Never>
-    .map { $0 * 2 }      // Publishers.Sequence<[Int], Never>
-    .map { Double($0) }  // Publishers.Sequence<[Double], Never>
-    .map { "\($0)" }     // Publishers.Sequence<[String], Never>
+let p1 = [1, 2, 3] // Array<Int>
+    .publisher                                           // Publishers.Sequence<[Int], Never>
+    .map(doubler)                                        // Publishers.Sequence<[Int], Never>
+    .map(Double.init)                                    // Publishers.Sequence<[Double], Never>
+    .map(\.description)                                  // Publishers.Sequence<[String], Never>
 type(of: p1)
 /*:
  Now this starts to look interesting.  Seems like a Publishers.Sequence is a
@@ -537,9 +539,9 @@ var queue = OperationQueue()
 var r6 = [String]()
 let sub3 = PassthroughSubject<Int, Never>()
 let c5 = [1, 2, 3, 4, 5, 6, 7].publisher
-    .map { $0 * 2 }
-    .map { Double($0) }
-    .map { "\($0)" }
+    .map(doubler)
+    .map(Double.init)
+    .map(\.description)
     .subscribe(on: queue)
     .receive(on: DispatchQueue.main)
     .sink { r6.append($0) }
