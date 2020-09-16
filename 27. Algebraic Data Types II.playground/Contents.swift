@@ -29,7 +29,7 @@ import Foundation
  
  Ok so we have arithmetic of types.  We can add them, multiply them
  and raise them to powers.  Do we have algebra as well?  Can we have
- functions of types.  Sure we can!
+ functions of types?  Sure we can!
  
  Generics are the functions of types - they take types in and return new types.
  This is the important point, we pass a type or types to a function and
@@ -336,7 +336,7 @@ struct _AlternativeCustomStringConvertible {
     var alternativeDescription: () -> String
 }
 /*:
- That type is called the "existential" type.  I'll explain the reasone
+ That type is called the "existential" type.  I'll explain the reason
  for that naming below in more detail, but you can think of it as making sure
  that a type which matches the protocol actually exists.
  

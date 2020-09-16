@@ -40,7 +40,7 @@ r1
  its entire input array to produce an output array which is chained
  to the next call.  None of the elements of any of the arrays can
  get ahead of each other - they pass through the machinations of
- the chain as a group. (If necessary, go back to Playground 27.
+ the chain as a group. (If necessary, go back to Playground 28.
  Higher Order Functions I and review the Swift Std Lib code
  for map to see why this might be).
  
@@ -165,9 +165,9 @@ var r2: [String] = []
  for you to refer to:
  
      let r1 = [1, 2, 3]      // Array<Int>
-         .map { $0 * 2 }     // Array<Int>
-         .map { Double($0) } // Array<Double>
-         .map { "\($0)" }    // Array<String>
+         .map(doubler)       // Array<Int>
+         .map(Double.init)   // Array<Double>
+         .map(\.description) // Array<String>
      r1
  
  Feel free to scroll back up and verify
@@ -177,8 +177,8 @@ var r2: [String] = []
  have the same array to start and the same `map` statements, but we've
  added two new lines.
  */
-let c1 = [1, 2, 3]
-    .publisher              // Array<Int>
+let c1 = [1, 2, 3]          // Array<Int>
+    .publisher              // Publishers.Sequence<[Int], Never>
     .map(doubler)           // Publishers.Sequence<[Int], Never>
     .map(Double.init)       // Publishers.Sequence<[Int], Never>
     .map(\.description)     // Publishers.Sequence<[Double], Never>
@@ -323,18 +323,18 @@ var r3: [String] = []
  And again, here are our previous examples:
  
      let r1 = [1, 2, 3]      // Array<Int>
-         .map { $0 * 2 }     // Array<Int>
-         .map { Double($0) } // Array<Double>
-         .map { "\($0)" }    // Array<String>
+        .map(doubler)
+        .map(Double.init)
+        .map(\.description)
      r1
  
  And
  
      let c1 = [1, 2, 3]
         .publisher
-        .map { $0 * 2 }
-        .map { Double($0) }
-        .map { "\($0)" }
+        .map(doubler)
+        .map(Double.init)
+        .map(\.description)
         .sink { r2.append($0) }
 
  But now instead of using `[Int].publisher`
