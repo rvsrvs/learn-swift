@@ -205,8 +205,6 @@ func powerOfTypes<X, Y>(y: Y) -> X? {
   into nominal types.  We can even do that generically.
   */
 public struct Func<A, B> {
-    var x = 10
-    var y = 24.0
     public let call: (A) -> B
     
     public init(_ call: @escaping (A) -> B) {
@@ -218,7 +216,8 @@ public struct Func<A, B> {
     }
 }
 
-let f = Func { (a: Int) in a * 2}
+let f = Func { (a: Int) in a * 2 }
+type(of: f)
 f(2)
 /*:
   We will make extensive use of this in a future playground
@@ -258,9 +257,26 @@ f(2)
 extension Int {
     static var someString: String { "Made up string" }
     var timesTwo: Int { self * 2 }
-    static func addTogether(_ a: Int, _ b: Int) -> Int { a + b}
+    static func addTogether(_ a: Int, _ b: Int) -> Int { a + b }
+    static func addTogether2(_ a: Int) -> (Int) -> Int {
+        return { b in a + b }
+    }
     func add(_ other: Int) -> Int { self + other }
 }
+
+func addTogether(_ a: Int, _ b: Int) -> Int { a + b }
+
+Int.someString
+
+let i = 6
+Int.addTogether(6, 11)
+addTogether(6, 11)
+i.add(11)
+Int.addTogether2(i)(11)
+
+type(of: Int.addTogether)
+type(of: Int.add)
+type(of: Int.addTogether2)
 /*:
  If you go look in the object file that the compiler produces from
  the above code, you will find the following (suitably translated

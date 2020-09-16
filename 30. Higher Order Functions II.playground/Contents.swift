@@ -258,8 +258,8 @@ r3
  Don't believe me? Here it is:
  */
 public func flip<A, B, C>(
-    _ function: @escaping (A) -> (C) -> B
-) -> (C) -> (A) -> B {
+    _ function: @escaping (A) -> (C) -> B // (A,C) -> B
+) -> (C) -> (A) -> B { // (C, A) -> B
     { (c: C) -> (A) -> B in
         { (a: A) -> B in
             function(a)(c)
@@ -480,7 +480,7 @@ let s3 = StructA.staticAppend(StructA(a: "some string"))(" 5")
  But... we can in fact do what ObjC does, too.  Let's write a function for that.
  */
 public func uncurry<A, B, C>(
-    _ function: @escaping (A) -> (B)  -> C
+    _ function: @escaping (A) -> (B) -> C
 ) -> (A, B) -> C {
     { (a: A, b: B) -> C in
         function(a)(b)
@@ -646,6 +646,7 @@ type(of: combined)
  and not `(Int) -> Double -> String` as we could have.
  */
 combined(4)
+// func combined(_ val: Int) -> String
 /*:
  Note how all of these produce the exact same result:
  ```

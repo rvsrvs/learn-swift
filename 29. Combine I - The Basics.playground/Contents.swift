@@ -31,6 +31,7 @@ let r1 = [1, 2, 3]      // Array<Int>
     .map(Double.init)   // Array<Double>
     .map(\.description) // Array<String>
 r1
+type(of: r1)
 /*:
  This behaves in the way that we've become accustomed to:
  each of the 4 lines returns an Array. The first two lines return `[Int]`,
