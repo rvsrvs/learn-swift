@@ -537,7 +537,6 @@ import Dispatch
 import Foundation
 var queue = OperationQueue()
 var r6 = [String]()
-let sub3 = PassthroughSubject<Int, Never>()
 let c5 = [1, 2, 3, 4, 5, 6, 7].publisher
     .map(doubler)
     .map(Double.init)
@@ -546,7 +545,11 @@ let c5 = [1, 2, 3, 4, 5, 6, 7].publisher
     .receive(on: DispatchQueue.main)
     .sink { r6.append($0) }
 type(of: c5)
-r6
+
+DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+    let r7 = r6
+    print(r7)
+}
 /*:
  This demonstrates us taking any heavy calculations we need to
  do onto a background thread and then once its done bringing
