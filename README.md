@@ -134,7 +134,7 @@ The community is converging on using the functional programming aspects of Swift
 
 ### NEVER USE OUTSIDE OF MIXED IMPERATIVE/FUNCTIONAL CODEBASES
 
-- functions that return or accept `Void` - Void-returning (or accepting) functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with. (For brevity, I'll refer to functions which return _or accept_ Void henceforward as "Void-returning".)
+- functions that return or accept `Void` - Void-returning (or accepting) functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with. (For brevity, I'll refer to functions which return _or accept_ Void henceforward as "Void-returning".)  The only exception to this is that it can be a performance optimization to use `inout` parameters which result in Void returns (see below).
 - `Array.forEach` -`forEach` is used to perform Void-returning functions on Sequence types. It is itself a Void-returning function and therefore falls under the guideline of things to avoid for both what it does and what it returns. This should be avoided except for instances of interacting with imperative code.
 - `PassthroughSubject` from Combine. You use PassthroughSubject in order to invoke its `send` function, which is a Void-returning function and therefore indicative of an imperative-only interface. In a pure functional codebase this is not needed. It is there to connect the imperative and functional parts of your codebase.
 
@@ -143,11 +143,12 @@ The community is converging on using the functional programming aspects of Swift
 - Protocols. Protocols should be thought of as somewhat equivalent to `final` in inheritance-based systems. Because you can only conform any given type to a protocol in one way, you should verify that anything implemented as a protocol is actually the unique implementation for all conforming types. Most application-level declarations of protocols do not meet this test and should use protocol witness structs instead. So, for example, Hashable and Equatable can be implemented only one way for any given type and are therefore good subjects for protocols. CustomDebugStringConvertible frequently can be implemented in multiple ways for a given type and in those circumstances should be managed with a protocol witness rather than a conformance. You should think about this when you go to create a protocol type and by default use a witness type instead unless you can verify the uniqueness requirement for the implementation.
 - PATs (Protocols with Associated Types) should be reserved as a feature for people writing framework libraries. This is a very complicated area of the language, that as currently constituted, does not have a simple UX. PATs should be reserved for very specific cases where the programmer truly understands the interactions of the various concrete types being designed. The only exception to this may be protocols which have only an associatedtype of Self. If you are planning to make use of PATs you may well want to do some reading on type and category theory to make sure you understand the thinking that has already gone into standard library protocols like Sequence so that you avoid reinventing wheels.
 - the `mutating` keyword on structs. This should be used only as a performance optimization after it has been proven to be to necessary. It is frequently associated with functions returning Void. The deprecated pattern is to create a `var` struct or class and then immediately begin mutating its values to properly configure it. Usage of this pattern should always be replaced with inits which construct the value correctly to begin with. Inits of this type frequently take closures so you'll want to be aware of how to use closures in your initializers.
+- `inout` parameters.  `inout` and `mutating` are closely related,  Like `mutating`, `inout` should be used as a performance or size optimization after it has been proven to be necessary. 
 - `var` properties in structs. By default your data structures should be immutable and mutability should only be used after due consideration and a driving performance requirement. If you make your properties `let` by default, you will find that use of the mutating keyword in the previous point simply goes away on its own.
 
 ### ASPIRE NOT TO USE
 
-- trailing closure syntax if using Swift versions greater than 5.2\. With the introduction of the ability to use Keypaths in all places that closures can be used and the `callAsFunction` feature, many uses of inline closure declarations are no longer needed and can be replaced with a more "point-free" style.
+- trailing closure syntax (if using Swift versions greater than 5.2). With the introduction of the ability to use Keypaths in all places that closures can be used and the `callAsFunction` feature, many uses of inline closure declarations are no longer needed and can be replaced with a more "point-free" style.
 - `if` and `if-else` statements (prefer the use of ternary conditionals that return values instead), If `switch` had a language-supported form which returned values in the way that ternary if's do, switch would join this list.
 
 Note that some of the points above are not iron-clad rules but others are. For-loops, callbacks and inheritance are never needed and should not be used. Void-returning functions and PATs are appropriate in some specific but infrequent situations. Ternaries over if's and protocol witnesses can be aspirational. However, all uses of the above should be carefully considered before they are employed in code.
@@ -564,7 +565,7 @@ Accordingly, you should work to:
 - Sometimes, in long invocation chains, you will need to declare types to help the compiler figure out the types. This should be done only when the compiler barks at you about it and you should recognize what the barking means.
 - Never use constructs like aBool == true or aBool == false, just use aBool or !aBool instead
 
-## Future Developments
+## Type System limitations
 
 - Simulated Higher Kinded Types (HKTs). While swift has syntax for generic types in protocols, it does not have syntax for generic functions in protocols. (Exercise try to write a protocol for a generic type F parameterized by T which implements the following signature:
 
@@ -573,6 +574,8 @@ map<U>(transform: (T) -> U) -> F<U>
 ```
 
 It's not possible to write map because you can't add the generic type which parameterizes the return value. The [Generics Manifesto was recently modified](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md#generic-associatedtypes) to address this and PATs will eventually get generic associated types at which point a pretty good facsimile of higher kinded types will be available in Swift.
+
+## Future Developments
 
 - Memory Semantics: Library writers will need to understand the memory semantics coming soon. If that is you, specifically you need to know when move, borrow, and copy apply as described in [The Ownership Manifesto](https://github.com/apple/swift/blob/master/docs/OwnershipManifesto.md) Basically this is what is needed to make Swift fast enough to be a systems programming language to replace C. The memory ownership model is almost completely stolen (errrrr... borrowed) from Rust and there's loads of resources out there on the Rust implementation. Since the model is "opt-in" on top of the conservative model Swift has always had under ARC, programmers will have to be aware of these things in order to maximize performance of their code.
 
@@ -638,18 +641,11 @@ It's not possible to write map because you can't add the generic type which para
   - Are now in the [Generics Manifesto](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md#generic-associatedtypes)
   - These can be used to create the [Haskell-like signatures of HKTs](https://forums.swift.org/t/question-about-generic-associated-types-in-the-generic-manifesto/31816/2)
 
-### Numeric Algorithms in Swift
-
-- [The Differentiable Programming Manifesto](https://github.com/apple/swift/blob/master/docs/DifferentiableProgramming.md)
-- [Random Number Algorithms](https://www.cocoawithlove.com/blog/2016/05/19/random-numbers.html)
-
 ### Interfacing with unsafe code
-
 - [Unmanaged memory](https://www.mikeash.com/pyblog/friday-qa-2017-08-11-swiftunmanaged.html)
 - [UnsafePointers](http://technology.meronapps.com/2016/09/27/swift-3-0-unsafe-world-2/)
 
 ### Swift Mechanics
-
 - [Swift Method Dispatch](https://www.rightpoint.com/rplabs/switch-method-dispatch-table)
 - [Witnesses instead of protocols](https://medium.com/@vhart/protocols-generics-and-existential-containers-wait-what-e2e698262ab1)
 - [Trampolines as a means of coping with really deep recursion](https://www.uraimo.com/2016/05/05/recursive-tail-calls-and-trampolines-in-swift/)
@@ -657,14 +653,29 @@ It's not possible to write map because you can't add the generic type which para
 - [OSSA improvements](https://twitter.com/johannesweiss/status/1205812075005665281) to the SIL
 - [Syntactic Sugar](https://nshipster.com/callable/) in Swift
 
-### Swift UI
+### Swift Language
+- [Compiler](https://github.com/apple/swift)
+- [Package Manager](https://github.com/apple/swift-package-manager)
+- [Algorithms](https://github.com/apple/swift-algorithms)
 
+### Numeric Algorithms in Swift
+- [The Differentiable Programming Manifesto](https://github.com/apple/swift/blob/master/docs/DifferentiableProgramming.md)
+- [Random Number Algorithms](https://www.cocoawithlove.com/blog/2016/05/19/random-numbers.html)
+- [Swift Numerics](https://github.com/apple/swift-numerics)
+
+### Server-side Swift
+- [Argument Parsing](https://github.com/apple/swift-argument-parser)
+- [NIO](https://github.com/apple/swift-nio)
+- [Crypto](https://github.com/apple/swift-crypto)
+- [Protobuf](https://github.com/apple/swift-protobuf)
+- [Logging](https://github.com/apple/swift-log)
+
+### Swift UI
 - [Swift with Majid](https://swiftwithmajid.com)
 - [SwiftUI Lab](https://swiftui-lab.com)
 - [Apple Tutorials](https://developer.apple.com/tutorials/swiftui/tutorials)
 
 ### App Architecture
-
 - [The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture)
 - [The Composable Architecture, Part I](https://www.pointfree.co/episodes/ep100-a-tour-of-the-composable-architecture-part-1)
 - [The Composable Architecture, Part II](https://www.pointfree.co/episodes/ep101-a-tour-of-the-composable-architecture-part-2)
@@ -672,10 +683,8 @@ It's not possible to write map because you can't add the generic type which para
 - [The Composable Architecture, Part IV](https://www.pointfree.co/episodes/ep103-a-tour-of-the-composable-architecture-part-4)
 
 ### Other Comonadic Architectures
-
 - [Elm](https://elm-lang.org)
 - [React/Redux](https://redux.js.org)
 
 ### Graphics - Not Swift Specific
-
 - [Affine Transforms](https://www.cs.utexas.edu/users/fussell/courses/cs384g-fall2011/lectures/lecture07-Affine.pdf)

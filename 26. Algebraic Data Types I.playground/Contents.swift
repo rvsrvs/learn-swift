@@ -174,10 +174,11 @@ struct BoolLittleInt {
  that's what we'll call them).
  
  Swift has both. In Swift, structural types cannot have names, structure alone
- specifies the type.  Nominal types in Swift have to have unique names and
+ specifies the type.  Nominal types in Swift _must_ have unique names and
  only things of the same named type can be interchanged.
  Structural _product_ types (there are structural types in Swift that aren't products)
- are called `tuples` and are in fact the type that is passed to functions.
+ are called `tuples` and are in fact, from the point of view of the programmer,
+ the type that is passed to functions.
  They can of course also be passed back, they're just types after all.
  Both tuples and structs are product types, though.
  
@@ -643,8 +644,24 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  
  (if you don't believe me,
  see the example of `(Bool) -> (Bool) -> Bool` immediately above)
- 
- Ok, so what _that_ means is that there is a 1-to-1 relationship between
+
+ So, let’s do an example with actual numbers.
+ Take a function of the form: `(C, D) -> B` . To keep it easy, let’s also let the cardinalities be:
+ `C = 2`, `D = 3`, `B = 10`.  The cardinality of `(C, D)` is `2x3` or `6`,
+ so my claim is that the cardinality of that function type is then `10^(2x3)` or `10^6`
+ or `1_000_000`.
+
+ But using simple logarithm rules, `10^6 = (10^2)^3`, in words
+ `10 squared cubed`, Let’s check that: `100 x 100 x100 = 1_000_000` yep,
+ it works. If we reverse the arguments it’s `10 cubed squared`,
+ `(10^3)^2 or 1000 x 1000 = 1_000_000`,  yep that checks.
+ And furthermore it checks no matter what the C,  D and B are.
+
+ Note that for this to work, the base of all of our exponentiation has to be the cardinality of the type
+ farthest to the right.  In this case 10.  You can't arbitrarily rearrange _that_.  And you can't regroup
+ with (A) -> (B,C), that's not the same type at all.
+
+ Ok, so back to the 1-to-1 relationship between
  functions of the form:
  
      (C, D) -> B
@@ -653,7 +670,8 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  
      (C) -> (D) -> B
  
- You can always convert between one form and the other.  In fact, using
+ What the above arithemetic implies is that you can
+ _always_ convert between one form and the other.  In fact, using
  generics (to be discussed below) you can write a function which accepts
  a function in the first form and returns a function in the second form.
  And you can write a function which reverses that. And these are really
@@ -668,7 +686,10 @@ func tb9(_ t: Bool) -> Three { t ? .three : .three }
  
  Which simply says that order of arguments to a multi-argument function
  doesn't matter.  Which is good, because we already knew that, at least.
- 
+
+ Working with our example above `10 cubed squared = 10 squared cubed`,
+ for a very understandable reason, basic arithmetic.
+
  To be clear about what (C) -> (D) -> B means, it is a function which
  accepts a value of type C and returns a function of type (D) -> B.
  This is called `currying` (C, D) -> B and is named after the mathemetician
