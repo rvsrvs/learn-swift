@@ -1,8 +1,8 @@
 /*:
  ## Inheritance
  
- * There is no default base class for Swift objects. Any class that doesn't derive from
-   another class is a base class.
+ * Inheritance exists in `Swift`, but as of 2020, is never needed except when
+ interfacing with existing Objective-C code.  This chapter is included for completeness.
  
  Let's start with a simple base class:
 */

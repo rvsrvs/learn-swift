@@ -128,8 +128,8 @@ The community is converging on using the functional programming aspects of Swift
 
 - for-loops - use Sequence higher-order methods instead
 - while-loops outside of `RunLoops` - use trampolines instead.
-- callbacks, delegates, `NotificationCenter`s, or similar constructions - you should replace these with use of Combine Publisher(s) in every case
-- inheritance - replace with a mix of generic wrappers, enums, protocols and protocol witnesses as appropriate,
+- callbacks, delegates, `NotificationCenter`s, or similar constructions - you should replace these with use of Combine Publisher(s) or NIO EventLoopFutures in every case
+- inheritance - replace with a mix of generic wrappers, enums, and protocol witnesses as appropriate,
 - the `throws` keyword in APIs that you design - you should use Result instead. `throw`-ing functions simply do not compose well and hence do not fit well inside a functional code base.
 
 ### NEVER USE OUTSIDE OF MIXED IMPERATIVE/FUNCTIONAL CODEBASES
@@ -200,19 +200,19 @@ This model is precisely the one used by SwiftUI. Display update is a direct side
 The above ineluctably implies that long-running applications should be organized as collections of functions of the form:
 
 ```
- (ApplicationState, Event)->(ApplicationState, [Effect<Action>])
+ (ApplicationState, Action)->(ApplicationState, Effect<Action>)
 ```
 
 (In Swift terms, the array of effects is actually replaced by a Publisher). In functional programming terms, functions with this signature are called reducers. Your application should decompose this function into a chain of function invocations mediated by the type system. If you are working with a mutable ApplicationState, this signature is
 
 ```
-(&ApplicationState, Event)->[Effect<Action>]
+(&ApplicationState, Action) -> Effect<Action>
 ```
 
 The equivalent form of this latter function in OO notation is:
 
 ```
-applicationState.handle(anEvent)->[Effect<Action>]
+applicationState.handle(anAction) -> Effect<Action>
 ```
 
 where the applicationState is mutated by the event handling method call.
@@ -581,13 +581,22 @@ It's not possible to write map because you can't add the generic type which para
 
 - ABI Stability -> Module Stability -> Binary compatibility: [How Swift Achieved Dynamic Linking Where Rust Couldn't](https://gankra.github.io/blah/swift-abi/) is absolutely the best explanation I have seen of why all this is important. People writing libraries need to be aware of every detail in it because they will eventually want to implement their own sort of stability. You should also be aware of: <https://swift.org/blog/abi-stability-and-more/> this post as the best explanation of the future direction. And of course there's the [official manifesto itself](https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md)
 
-- Concurrency: Swift lacks a good concurrency model. This keeps it from being a complete system programming language and as this is a core goal of the language we can assume that this is being actively worked on by the core team. We can also assume that the new memory semantics will be the basis on which a new concurrency model is implemented. There's a lot to think about here. Here are some data points:
+- Concurrency Background: Swift is in the process of being given a good concurrency model. 
 
-  - the concurrency manifesto that Lattner and Groff were writing: [The Concurrency Manifesto](https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782) seems to have been abandoned. There have been no steps to implementing it taken in Swift 5 and no changes to the document in a long time. It specifies the addition of Async/Await and an Actor model in the language.
-  - there was also [a concrete proposal for Async/Await](https://gist.github.com/lattner/429b9070918248274f25b714dcfc7619) by the same authors. It was even tentatively scheduled as a Swift Evolution proposal (i.e. the title of the doc is SE-XXXX). Again, no steps toward implementation in master seem to have been taken.
-  - Apple has been completely silent about open sourcing the Combine framework which has led to numerous open source projects trying to implement an identical solution for use on non-Apple platforms. The silence and failure to include such obviously important APIs in either the Std Lib or in the Unix distributions of Swift could be indicative of major changes coming in this area.
-  - The main themes for Swift 6.0 were recently published and those are: expanding Swift to other platforms and taking Concurrency forward. In short, stand-by for major improvements in the handling of asynchronous and concurrent APIs.
-  - SwiftNIO is all about concurrency and is built using industry standard techniques. It is very reasonable to presume that support for its techniques will work its way into actual language syntactic support.
+  - the concurrency manifesto that Lattner and Groff were writing: [The Concurrency Manifesto](https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782) The original explanation and still one of my favorites.
+  - [The inspiration for the new structured concurrency model](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/#id27)
+  
+- The Concurrency Proposals (so far):
+  - [Async/Await](https://github.com/apple/swift-evolution/blob/main/proposals/0296-async-await.md) Implemented in Swift 5.5
+  - [ObjC Interoperability](https://github.com/apple/swift-evolution/blob/main/proposals/0297-concurrency-objc.md) Implemented in Swift 5.5
+  - [Async Sequence](https://github.com/apple/swift-evolution/blob/main/proposals/0298-asyncsequence.md) Implemented in Swift 5.5
+  - [Continuations](https://github.com/apple/swift-evolution/blob/main/proposals/0300-continuation.md) Implemented in Swift 5.5
+  - [Marking Types for Concurrency](https://github.com/apple/swift-evolution/blob/main/proposals/0302-concurrent-value-and-concurrent-closures.md) [implementation](https://github.com/apple/swift/pull/35264)
+  - [Structured Concurrency](https://github.com/apple/swift-evolution/blob/main/proposals/0304-structured-concurrency.md) Active Review (March 31 - April 16 2021)
+  - [Actors](https://github.com/apple/swift-evolution/blob/main/proposals/0304-structured-concurrency.md) Active review (April 9...23, 2021)
+  - [Properties with Effects](https://github.com/apple/swift-evolution/blob/main/proposals/0310-effectful-readonly-properties.md) Active review (April 13...27, 2021)
+  - [Task Local Values](https://github.com/apple/swift-evolution/blob/main/proposals/0311-task-locals.md) Active Review (April 16...26, 2021)
+
 
 ## Interesting Links on Advanced Topics
 
@@ -597,6 +606,9 @@ It's not possible to write map because you can't add the generic type which para
 - [Statically vs Dynamically Typed Systems](https://lexi-lambda.github.io/blog/2020/01/19/no-dynamic-type-systems-are-not-inherently-more-open/)
 - The well-known Scott Wlaschin talk [Functional Design Patterns](https://www.slideshare.net/ScottWlaschin/fp-patterns-buildstufflt) also available [as video](https://www.youtube.com/watch?v=srQt1NAHYC0)
 - [Hillel Wayne on Type-driven modelling](https://www.hillelwayne.com/post/constructive/)
+- [Tomas Petricek: What we talk about when we talk about monads](https://arxiv.org/pdf/1803.10195)
+- [Adjunctions explained](https://iokasimov.github.io/posts/2020/10/arrow-and-comma)
+- [Gabriel Gonzolez's classic post "Get rid of your typeclasses"](http://www.haskellforall.com/2012/05/scrap-your-type-classes.html)
 - Pointfree's free episodes (personally I recommend you pay for a subscription if you are going to be a professional Swift programmer):
 
   - [Functions](https://www.pointfree.co/episodes/ep1-functions)
@@ -610,7 +622,8 @@ It's not possible to write map because you can't add the generic type which para
   - [The Combine Framework and Effects: Part 1](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-1)
   - [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
   - [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
-
+  - [Redaction](https://www.pointfree.co/episodes/ep115-redacted-swiftui-the-problem)
+  
 ### Generic Programming and Higher Kinded Types in Swift
 
 - [The Generics Manifesto](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md)
@@ -643,20 +656,25 @@ It's not possible to write map because you can't add the generic type which para
 
 ### Interfacing with unsafe code
 - [Unmanaged memory](https://www.mikeash.com/pyblog/friday-qa-2017-08-11-swiftunmanaged.html)
-- [UnsafePointers](http://technology.meronapps.com/2016/09/27/swift-3-0-unsafe-world-2/)
+- [UnsafePointers (somewhat outdated, but worth a look)](http://technology.meronapps.com/2016/09/27/swift-3-0-unsafe-world-2/)
 
 ### Swift Mechanics
+- [ABI Stability -> Module Stability -> Binary compatibility: How Swift Achieved Dynamic Linking Where Rust Couldn't](https://gankra.github.io/blah/swift-abi/)
+- [official ABI stability manifesto](https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md)
 - [Swift Method Dispatch](https://www.rightpoint.com/rplabs/switch-method-dispatch-table)
 - [Witnesses instead of protocols](https://medium.com/@vhart/protocols-generics-and-existential-containers-wait-what-e2e698262ab1)
-- [Trampolines as a means of coping with really deep recursion](https://www.uraimo.com/2016/05/05/recursive-tail-calls-and-trampolines-in-swift/)
+- [Trampolines as a means of coping with deep recursion](https://www.uraimo.com/2016/05/05/recursive-tail-calls-and-trampolines-in-swift/)
 - [The new objc_msgSend](https://www.mikeash.com/pyblog/objc_msgsends-new-prototype.html)
-- [OSSA improvements](https://twitter.com/johannesweiss/status/1205812075005665281) to the SIL
-- [Syntactic Sugar](https://nshipster.com/callable/) in Swift
+- [OSSA improvements to the SIL](https://twitter.com/johannesweiss/status/1205812075005665281)
+- [Syntactic Sugar in Swift](https://nshipster.com/callable/)
+- [Informative thread on swift performance](https://forums.swift.org/t/swift-performance/28776/46)
+- [Associated Types and Protocols](https://khawerkhaliq.com/blog/swift-associated-types-self-requirements/)
 
 ### Swift Language
 - [Compiler](https://github.com/apple/swift)
 - [Package Manager](https://github.com/apple/swift-package-manager)
 - [Algorithms](https://github.com/apple/swift-algorithms)
+- [Collections](https://github.com/apple/swift-collections)
 
 ### Numeric Algorithms in Swift
 - [The Differentiable Programming Manifesto](https://github.com/apple/swift/blob/master/docs/DifferentiableProgramming.md)

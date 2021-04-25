@@ -5,8 +5,8 @@
 3. Do a separate playground on contraMap, using Predicate as an example. Show that it is a characteristic of generics over functions
 4. Add a playground on contraFlatMap continuing to use Predicate as the example
 5. Add a separate playground on dimap as the composition of a contraMap and a map.
-6. Carry the six preceding playgrounds into a playground on the Func type
-7. Do a separate playground on Protocol Witnesses explaining existential types
+6. Carry the preceding playgrounds into a playground on the Func type.  Provid std forms of map, flatmap, contramap, contraflatmap, dimap, invmap
+7. Do a separate playground on Protocol Witnesses explaining existential types, work through mechanically getting rid of protocols altogether
 8. Carry the two preceding playgrounds into a playground on CallAsFunction protocol
 9. Show the complete interaction between base functions, Func and CallAsFunction to produce the FunctionalProgramming.swift playground
 10. Do a playground on KeyPath and Binding and show how they are alike. In particular show that the compose getters and setters
@@ -23,7 +23,11 @@
   5. inheritance -> Func via currying
   6. wait -> Future/Promise
 
-16. Add KeyPaths to the base swift material
+16. Add KeyPaths and Bindings to the base swift material
 17. Add CallAsFunction to the base swift material
 18. Add a playground on function dispatch to the base material
 19. Incorporate `@escaping` to the base material
+20. Incorporate `inout` to the base material
+21. Add a playground on invmap to show the extension to Reducers
+22. Review current version of `The Swift Programming Language` for missed items.
+23. Add a playground on variadic functions

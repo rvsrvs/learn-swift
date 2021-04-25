@@ -47,7 +47,7 @@
       location = "group:08. Enumerations.playground">
    </FileRef>
    <FileRef
-      location = "group:09. Classes and Structures.playground">
+      location = "group:/Users/rvs/Development/Projects/HarvardExtension/learn-swift/09. Classes and Structs.playground">
    </FileRef>
    <FileRef
       location = "group:10. Properties.playground">
@@ -138,6 +138,9 @@
    </FileRef>
    <FileRef
       location = "group:38. App Architecture II - Reducers.playground">
+   </FileRef>
+   <FileRef
+      location = "group:98. Keypaths and Bindings.playground">
    </FileRef>
    <FileRef
       location = "group:99. Pointfree Style.playground">
