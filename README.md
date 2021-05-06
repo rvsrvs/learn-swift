@@ -120,9 +120,9 @@ Coming Swift features:
 
 See below for more details on these and several other FP (functional programming)-related features.
 
-## Swift Language Features That Should be Avoided
+## [Swift Language Features That Should be Avoided](#ToAvoid)
 
-The community is converging on using the functional programming aspects of Swift and deprecating the imperative programming parts. At this point it is clear that many of the imperative features of the language are there to smooth the transition from ObjC to Swift. These features remain in the language, but best practice is to use them more and more sparingly, if at all. Because of this (and often surprisingly to those familiar only with the imperative style), best practice is to avoid the following features of Swift:
+Much of the Swift community is converging on using the functional programming aspects of Swift and deprecating the imperative programming parts. To be fluent in reading Swift code, you need to be able to read all forms, but the preferred forms to use are those that facilitate composition. At this point it is clear that many of the imperative features of the language are there to smooth the transition from ObjC to Swift and should be avoided. These features remain in the language, but best practice is to use them more and more sparingly, if at all. Because of this (and often surprisingly to those familiar only with the imperative style), best practice is to avoid the following features of Swift:
 
 ### NEVER USE
 
@@ -134,7 +134,7 @@ The community is converging on using the functional programming aspects of Swift
 
 ### NEVER USE OUTSIDE OF MIXED IMPERATIVE/FUNCTIONAL CODEBASES
 
-- functions that return or accept `Void` - Void-returning (or accepting) functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with. (For brevity, I'll refer to functions which return _or accept_ Void henceforward as "Void-returning".)  The only exception to this is that it can be a performance optimization to use `inout` parameters which result in Void returns (see below).
+- functions that return or accept `Void` - Void-returning (or accepting) functions, by construction, can only be used to accomplish side-effects. The type system has specific capabilities to handle side-effects in more efficient functional ways, so Void-returning functions should be avoided. E.g. if you return Void because you are dispatching an asynchronous operation, you should look at Combine or SwiftNIO and return a Future instead, if you are returning Void from a setter, you should consider the functional alternatives that allow chained application or, even better, move to using immutable objects that are constructed correctly to begin with. (For brevity, I'll refer to functions which return _or accept_ Void henceforward as "Void-returning".) The only exception to this is that it can be a performance optimization to use `inout` parameters which result in Void returns (see below).
 - `Array.forEach` -`forEach` is used to perform Void-returning functions on Sequence types. It is itself a Void-returning function and therefore falls under the guideline of things to avoid for both what it does and what it returns. This should be avoided except for instances of interacting with imperative code.
 - `PassthroughSubject` from Combine. You use PassthroughSubject in order to invoke its `send` function, which is a Void-returning function and therefore indicative of an imperative-only interface. In a pure functional codebase this is not needed. It is there to connect the imperative and functional parts of your codebase.
 
@@ -143,7 +143,7 @@ The community is converging on using the functional programming aspects of Swift
 - Protocols. Protocols should be thought of as somewhat equivalent to `final` in inheritance-based systems. Because you can only conform any given type to a protocol in one way, you should verify that anything implemented as a protocol is actually the unique implementation for all conforming types. Most application-level declarations of protocols do not meet this test and should use protocol witness structs instead. So, for example, Hashable and Equatable can be implemented only one way for any given type and are therefore good subjects for protocols. CustomDebugStringConvertible frequently can be implemented in multiple ways for a given type and in those circumstances should be managed with a protocol witness rather than a conformance. You should think about this when you go to create a protocol type and by default use a witness type instead unless you can verify the uniqueness requirement for the implementation.
 - PATs (Protocols with Associated Types) should be reserved as a feature for people writing framework libraries. This is a very complicated area of the language, that as currently constituted, does not have a simple UX. PATs should be reserved for very specific cases where the programmer truly understands the interactions of the various concrete types being designed. The only exception to this may be protocols which have only an associatedtype of Self. If you are planning to make use of PATs you may well want to do some reading on type and category theory to make sure you understand the thinking that has already gone into standard library protocols like Sequence so that you avoid reinventing wheels.
 - the `mutating` keyword on structs. This should be used only as a performance optimization after it has been proven to be to necessary. It is frequently associated with functions returning Void. The deprecated pattern is to create a `var` struct or class and then immediately begin mutating its values to properly configure it. Usage of this pattern should always be replaced with inits which construct the value correctly to begin with. Inits of this type frequently take closures so you'll want to be aware of how to use closures in your initializers.
-- `inout` parameters.  `inout` and `mutating` are closely related,  Like `mutating`, `inout` should be used as a performance or size optimization after it has been proven to be necessary. 
+- `inout` parameters. `inout` and `mutating` are closely related, Like `mutating`, `inout` should be used as a performance or size optimization after it has been proven to be necessary.
 - `var` properties in structs. By default your data structures should be immutable and mutability should only be used after due consideration and a driving performance requirement. If you make your properties `let` by default, you will find that use of the mutating keyword in the previous point simply goes away on its own.
 
 ### ASPIRE NOT TO USE
@@ -383,7 +383,9 @@ You will want to:
 - Only use classes when you must have a reference type such as when you need to access an instance in multiple threads, or when you will need to perform post-instantiation mutation.
 
 - By default, properties of a struct should be let, not var. Always look to see if you can make something a let and set it at init time rather than just making it a var on the chance that you will want to update it.
+
 - If you find that you have created a class that only has let properties, it should almost certainly be a struct and not a class
+
 - Corollary to the use of structs by default: avoid the mutating keyword in structs where possible.
 - Immutability is actually a feature, not a bug. if you need mutability you probably need a generic class wrapping the struct and you need an entirely new copy of the struct for each change.
 - If you must mutate try to do so in private methods.
@@ -581,12 +583,13 @@ It's not possible to write map because you can't add the generic type which para
 
 - ABI Stability -> Module Stability -> Binary compatibility: [How Swift Achieved Dynamic Linking Where Rust Couldn't](https://gankra.github.io/blah/swift-abi/) is absolutely the best explanation I have seen of why all this is important. People writing libraries need to be aware of every detail in it because they will eventually want to implement their own sort of stability. You should also be aware of: <https://swift.org/blog/abi-stability-and-more/> this post as the best explanation of the future direction. And of course there's the [official manifesto itself](https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md)
 
-- Concurrency Background: Swift is in the process of being given a good concurrency model. 
+- Concurrency Background: Swift is in the process of being given a good concurrency model.
 
   - the concurrency manifesto that Lattner and Groff were writing: [The Concurrency Manifesto](https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782) The original explanation and still one of my favorites.
   - [The inspiration for the new structured concurrency model](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/#id27)
-  
+
 - The Concurrency Proposals (so far):
+
   - [Async/Await](https://github.com/apple/swift-evolution/blob/main/proposals/0296-async-await.md) Implemented in Swift 5.5
   - [ObjC Interoperability](https://github.com/apple/swift-evolution/blob/main/proposals/0297-concurrency-objc.md) Implemented in Swift 5.5
   - [Async Sequence](https://github.com/apple/swift-evolution/blob/main/proposals/0298-asyncsequence.md) Implemented in Swift 5.5
@@ -596,7 +599,6 @@ It's not possible to write map because you can't add the generic type which para
   - [Actors](https://github.com/apple/swift-evolution/blob/main/proposals/0304-structured-concurrency.md) Active review (April 9...23, 2021)
   - [Properties with Effects](https://github.com/apple/swift-evolution/blob/main/proposals/0310-effectful-readonly-properties.md) Active review (April 13...27, 2021)
   - [Task Local Values](https://github.com/apple/swift-evolution/blob/main/proposals/0311-task-locals.md) Active Review (April 16...26, 2021)
-
 
 ## Interesting Links on Advanced Topics
 
@@ -623,7 +625,7 @@ It's not possible to write map because you can't add the generic type which para
   - [The Combine Framework and Effects: Part 2](https://www.pointfree.co/episodes/ep80-the-combine-framework-and-effects-part-2)
   - [Swift UI Snapshot Testing](https://www.pointfree.co/episodes/ep86-swiftui-snapshot-testing)
   - [Redaction](https://www.pointfree.co/episodes/ep115-redacted-swiftui-the-problem)
-  
+
 ### Generic Programming and Higher Kinded Types in Swift
 
 - [The Generics Manifesto](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md)
@@ -655,10 +657,12 @@ It's not possible to write map because you can't add the generic type which para
   - These can be used to create the [Haskell-like signatures of HKTs](https://forums.swift.org/t/question-about-generic-associated-types-in-the-generic-manifesto/31816/2)
 
 ### Interfacing with unsafe code
+
 - [Unmanaged memory](https://www.mikeash.com/pyblog/friday-qa-2017-08-11-swiftunmanaged.html)
 - [UnsafePointers (somewhat outdated, but worth a look)](http://technology.meronapps.com/2016/09/27/swift-3-0-unsafe-world-2/)
 
 ### Swift Mechanics
+
 - [ABI Stability -> Module Stability -> Binary compatibility: How Swift Achieved Dynamic Linking Where Rust Couldn't](https://gankra.github.io/blah/swift-abi/)
 - [official ABI stability manifesto](https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md)
 - [Swift Method Dispatch](https://www.rightpoint.com/rplabs/switch-method-dispatch-table)
@@ -671,17 +675,20 @@ It's not possible to write map because you can't add the generic type which para
 - [Associated Types and Protocols](https://khawerkhaliq.com/blog/swift-associated-types-self-requirements/)
 
 ### Swift Language
+
 - [Compiler](https://github.com/apple/swift)
 - [Package Manager](https://github.com/apple/swift-package-manager)
 - [Algorithms](https://github.com/apple/swift-algorithms)
 - [Collections](https://github.com/apple/swift-collections)
 
 ### Numeric Algorithms in Swift
+
 - [The Differentiable Programming Manifesto](https://github.com/apple/swift/blob/master/docs/DifferentiableProgramming.md)
 - [Random Number Algorithms](https://www.cocoawithlove.com/blog/2016/05/19/random-numbers.html)
 - [Swift Numerics](https://github.com/apple/swift-numerics)
 
 ### Server-side Swift
+
 - [Argument Parsing](https://github.com/apple/swift-argument-parser)
 - [NIO](https://github.com/apple/swift-nio)
 - [Crypto](https://github.com/apple/swift-crypto)
@@ -689,11 +696,13 @@ It's not possible to write map because you can't add the generic type which para
 - [Logging](https://github.com/apple/swift-log)
 
 ### Swift UI
+
 - [Swift with Majid](https://swiftwithmajid.com)
 - [SwiftUI Lab](https://swiftui-lab.com)
 - [Apple Tutorials](https://developer.apple.com/tutorials/swiftui/tutorials)
 
 ### App Architecture
+
 - [The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture)
 - [The Composable Architecture, Part I](https://www.pointfree.co/episodes/ep100-a-tour-of-the-composable-architecture-part-1)
 - [The Composable Architecture, Part II](https://www.pointfree.co/episodes/ep101-a-tour-of-the-composable-architecture-part-2)
@@ -701,8 +710,10 @@ It's not possible to write map because you can't add the generic type which para
 - [The Composable Architecture, Part IV](https://www.pointfree.co/episodes/ep103-a-tour-of-the-composable-architecture-part-4)
 
 ### Other Comonadic Architectures
+
 - [Elm](https://elm-lang.org)
 - [React/Redux](https://redux.js.org)
 
 ### Graphics - Not Swift Specific
+
 - [Affine Transforms](https://www.cs.utexas.edu/users/fussell/courses/cs384g-fall2011/lectures/lecture07-Affine.pdf)
