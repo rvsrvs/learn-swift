@@ -18,7 +18,7 @@ It is my observation that Swift as a language has three parts:
 
 3. A layer of features which exists to provide backwards compatibility to C, Objective C, and even Python. This portion of the language makes use of standard, single inheritance, pointer-based, object-oriented programming techniques.
 
-Given the state of Apple's platform in 2010 when Swift development began, the backwards compatibility layer inescapably had to be developed and completed first and Apple had to engage in a lengthy and laborious process of converting programmers to the new platform. As I write in early 2020, most of the Apple development community has moved to the new platform with only a few laggards remaining, but much of the community still writes its code using the OO syntactic elements and is not yet fully up to speed with functional kernel.
+Given the state of Apple's platform in 2010 when Swift development began, the backwards compatibility layer inescapably had to be developed and completed first and Apple had to engage in a lengthy and laborious process of converting programmers to the new platform. As I write in early 2020, most of the Apple development community has moved to the new platform with only a few laggards remaining, but much of the community still writes its code using the OO syntactic elements and is not yet fully up to speed with the functional kernel.
 
 I believe that Swift 6, Combine and SwiftUI represent an inflection point where the community as a whole will begin transitioning from the OO paradigm and begin making full use of the smaller syntactic core. The ultimate goal of this repository is to help my students move in that direction and prepare them for the shift I see underway in the Swift community.
 

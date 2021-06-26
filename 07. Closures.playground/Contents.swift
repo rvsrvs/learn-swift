@@ -260,7 +260,22 @@ incrementBy10() // returns 50
 
  ### Escaping Closures
  
- 
- 
+ An _escaping_ closure is a closure passed as an argument to a function which is held in some way for use after the function returns.
+ Here is a contrived example:
  */
+func integerArithmetic(
+    operation: @escaping (Int, Int) -> Int
+) -> ((Int, Int) -> Int) {
+    return { a, b in operation(a, b) }
+}
+let expression = integerArithmetic(operation: +)
+expression(2, 3)
 
+let expression2 = integerArithmetic(operation: { $0 * $1 })
+expression2(2, 3)
+/*:
+ Note that the function `integerArithmetic` does not use the function `operation`.  It instead embeds it
+ in a closure and returns the new closure.  `operation` is only called _after_ `integerArithmetic` has returned.
+ i.e. it has *_escaped_* the boundaries of `integerArithmetic`.  Whenever this is the case, the argument
+ passed in _must_ marked as `@escaping`.
+ */
