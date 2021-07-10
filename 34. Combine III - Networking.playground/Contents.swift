@@ -121,8 +121,8 @@ func log<E>(completion: Subscribers.Completion<E>) {
 }
 
 func log<T>(data: T) {
-    type(of: data)
-    data
+    print(type(of: data))
+    print(data)
 }
 /*:
  Now lets use the Foundation-provided URLSession class to fetch

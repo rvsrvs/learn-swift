@@ -8,20 +8,18 @@ import Foundation
  1. Types are "bags of values" where we can say what
  values are in, what values are out and we can distinguish each
  value unambiguously from each other value.
- 2. We can determine the cardinality of any of our types
- 3. Structs and tuples are product types
- 4. Enums are sum types
- 5. Functions are themselves types and in particular are exponential types
- 6. Structs and enums are nominal types
- 7. Tuples are structural types (called compound types in the apple doc)
- 8. Functions can take as arguments and return either
+ 1. We can determine the cardinality of any of our types
+ 1. Structs and tuples are product types
+ 1. Enums are sum types
+ 1. Functions are themselves types and in particular are exponential types
+ 1. Structs and enums are nominal types
+ 1. Tuples are structural types (called compound types in the apple doc)
+ 1. Functions can take as arguments and return either
  nominal or structural types but they themselves are structural types
- 9. Multi-argument functions are in one-to-one correspondence
- with their curried form and can be mechanically converted to
- the curried form and back
- 10. Order of arguments to a function does not break currying
- 11. Void is the type inhabited by only one value
- 12. Never is the type inhabited by zero values
+ 1. Multi-argument functions are in one-to-one correspondence with their curried form and can be mechanically converted to the curried form and back
+ 1. Order of arguments to a function does not break currying
+ 1. Void is the type inhabited by only one value
+ 1. Never is the type inhabited by zero values
  
  All of this constitutes an arithmetic of types.
  
