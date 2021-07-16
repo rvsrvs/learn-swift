@@ -131,16 +131,16 @@
       location = "group:35. Combine IV - Timers.playground">
    </FileRef>
    <FileRef
-      location = "group:36. Combine V - Property Wrappers.playground">
+      location = "group:36. App Architecture I - Principles.playground">
    </FileRef>
    <FileRef
-      location = "group:37. App Architecture I - Principles.playground">
+      location = "group:37. App Architecture II - Reducers.playground">
    </FileRef>
    <FileRef
-      location = "group:38. App Architecture II - Reducers.playground">
+      location = "group:38. Concurrency I - Apply and Compose .playground">
    </FileRef>
    <FileRef
-      location = "group:39. Concurrency.playground">
+      location = "group:39. Concurrency II - Async and Await.playground">
    </FileRef>
    <FileRef
       location = "group:98. Keypaths and Bindings.playground">

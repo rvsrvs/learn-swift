@@ -4,17 +4,17 @@
  This playground is designed to demonstrate what I feel are the main design considerations for, on the one hand NIO's EventLoopPromise/Future mechanism and Combine and on the other Swift 6 Concurrency.  The points to be made are:
 
  1. OOP techniques such as `objc_msgSend` are equivalent to the Continuation Passing Style (CPS) from functional programming
- 2. CPS and the `direct` style are different but compatible techniques of function composition
- 3. CPS gives rise to the Continuation monad below, the `direct` style gives rise to the Func monad below
- 4. The tools that Apple provides for asynchrony in Swift 5 and lower (Thread, DispatchQueue, RunLoop, and OperationQueue) are wrappers around OS-level constructs which are inherently effect-ful because their invocation returns Void.
- 5. The only options when using these techniques are for the invoking functions to either return Void themselves or to hang the thread they are running in.  Since hanging the thread is unacceptable, the only real option is for the the invoking context to return Void as well.
- 6. The Continuation monad can accomodate Void returns by handling the value that would be ordinarily be returned as a side-effect at the end of composition chain.
- 7. The Func monad becomes useless in the presence of Void returns
- 8. Useful concepts like cancellation and, especially, back pressure are best suited to the Func monad
- 9. NIO and Combine are Continuation-based in order to take advantage of the available asynchrony
- 10. Restoring compositionality _requires_ asynchrony techniques which return values but which don't hang the thread in which they are invoked
- 11. async/await and Actor are those techniques
- 12. Those techniques are language-level features rather than OS-level features bc the operating system does not have a concept of "return value", but languages do.  i.e. This problem can only be addressed at the language level, NOT by the introduction of new OS constructs.
+ 1. CPS and the `direct` style are different but compatible techniques of function composition
+ 1. CPS gives rise to the Continuation monad below, the `direct` style gives rise to the Func monad below
+ 1. The tools that Apple provides for asynchrony in Swift 5 and lower (Thread, DispatchQueue, RunLoop, and OperationQueue) are wrappers around OS-level constructs which are inherently effect-ful because their invocation returns Void.
+ 1. The only options when using these techniques are for the invoking functions to either return Void themselves or to hang the thread they are running in.  Since hanging the thread is unacceptable, the only real option is for the the invoking context to return Void as well.
+ 1. The Continuation monad can accomodate Void returns by handling the value that would be ordinarily be returned as a side-effect at the end of composition chain.
+ 1. The Func monad becomes useless in the presence of Void returns
+ 1. Useful concepts like cancellation and, especially, back pressure are best suited to the Func monad
+ 1. NIO and Combine are Continuation-based in order to take advantage of the available asynchrony
+ 1. Restoring compositionality _requires_ asynchrony techniques which return values but which don't hang the thread in which they are invoked
+ 1. async/await and Actor are those techniques
+ 1. Those techniques are language-level features rather than OS-level features bc the operating system does not have a concept of "return value", but languages do.  i.e. This problem can only be addressed at the language level, NOT by the introduction of new OS constructs.
  */
 
 // Three functions that compose together
@@ -29,7 +29,8 @@ func encloseInSpaces(_ value: String) -> String { "   \(value)   " }
 //               (String) -> String
 // to get: (Int) -> String
 
-// Here is what the composition of the 3 functions above looks like
+// Here is what the composition of the 3 functions above looks like in
+// the standard swift function call notation
 encloseInSpaces(toString(doubler(14)))
 
 // Note that functions have type and it is the type that allows them to compose
@@ -41,15 +42,15 @@ type(of: encloseInSpaces)
 // a computed var on the type of the variable
 // This is possible because computed vars are really functions themselves
 // Note how we simply replace `value` above with `self` in each case
+
+extension Int {
+    var doubler: Double { .init(self * 2) }
+}
 extension Double {
     var toString: String { "\(self)" }
 }
 extension String {
     var encloseInSpaces: String { "   \(self)   " }
-}
-
-extension Int {
-    var doubler: Double { .init(self * 2) }
 }
 
 // Using this object-oriented notation, `encloseInSpaces(toString(doubler(14)))` becomes:
@@ -74,20 +75,20 @@ extension Int {
 
 // Note that the signature of `anotherDoubler` is exactly the same as our original `doubler` func
 type(of: Int.anotherDoubler) // (Int) -> Double
-type(of: Int.yetAnotherDoubler) // (Int) -> () -> Double
 
-// This is how the free function gets turned into a `method`
+// ANd note that this is how the free function gets turned into a `method`
 func yetAnotherDoubler(_ `self`: Int) -> () -> Double {
     { .init(`self` * 2) }
 }
 type(of: yetAnotherDoubler)
+type(of: Int.yetAnotherDoubler) // (Int) -> () -> Double
 
 14.doubler
 // Here's what the statement above looks like in ObjC style:
 // [14 doubler]
 14.yetAnotherDoubler()
 // In ObjC, there is no distinction between the property and the zero arg function
-// [14 yetAnotherDoubler] in ObjC style is the same as doubler
+// in ObjC style, [14 yetAnotherDoubler] is the same as doubler
 
 // NB The compiler fibs to us about computed vars, it won't tell us the type like
 // it will functions.  But we know that anywhere we have a KeyPath we can treat it as
@@ -112,7 +113,7 @@ func flip<A, B, C>(
     { b in { a in f(a)(b) } }
 }
 
-// we can compose functions at run time rather than at compile time
+// And we can compose functions at run time rather than at compile time
 public func compose<A, B, C>(
     _ f: @escaping (A) -> B,
     _ g: @escaping (B) -> C
@@ -125,7 +126,8 @@ public func compose<A, B, C>(
 14 + 13
 
 // And this fact allows us to make an infix version of our compose function
-// which will helpful in visualizing the relationship of compose to apply below
+// which will be helpful in visualizing the relationship of `compose` to `apply`
+// below
 precedencegroup CompositionPrecedence {
   associativity: right
   higherThan: ApplicationPrecedence
@@ -165,6 +167,7 @@ explicitDoubleString(14)
 // NB, if we mark compose as `@inlinable` (which we can't do in a playground)
 // The compiler will optimize the "by hand" form to be just the compositional form
 
+// Let's demonstrate that.
 let value = 14
 
 // So these are all different notations for exactly the same thing
@@ -181,16 +184,19 @@ public func apply<A, R>(
 }
 
 // Note if we could use @inlinable here: apply(a, f) == f(a)
-// by direct substitution
-
-
+// by direct substitution, these would all simplify down dramatically.
+// [[[14 doubler] toString] encloseInSpaces]
             apply(14,      doubler)                                              // 14.doubler
       apply(apply(14,      doubler),         toString)                           // 14.doubler.toString
 apply(apply(apply(14,      doubler),         toString),         encloseInSpaces) // 14.doubler.toString.encloseInSpaces
 apply(apply(apply(14, \Int.doubler), \Double.toString), \String.encloseInSpaces) // The same done with keypaths
-
-// `apply` is EXACTLY the same as `objc_msgSend` done _without_ inheritance and _with_ static rather
-// than dynamic dispatch via selectors.  Do you see why?
+encloseInSpaces(toString(doubler(14)))
+//  By the way...
+// `apply` is EXACTLY the same operation
+//  as `objc_msgSend`.  `apply` is just done _without_ inheritance and _with_ static rather
+// than dynamic dispatch via selectors.
+// Do you see why this statement is true?  If you are an ObjC programmer and don't
+// see it, you should look at the type signatures for objc_msgSend and IMP
 
 // And of course we can mix our composed functions with our apply function
 apply(14, infixDoubleString)
@@ -211,7 +217,7 @@ public func |><A, R>(
 }
 
 // Given the above, these are EXACTLY the same thing
-// we're just sprinkling on some "syntactic sugar"
+// we're just sprinkling on some syntactic sugar
 apply(14, infixDoubleString)
 14 |> infixDoubleString
 infixDoubleString(14)
@@ -220,9 +226,11 @@ infixDoubleString(14)
 // reminder, this is the composition
 (doubler >>> toString >>> encloseInSpaces)(14)  // Direct Style
 
-// None of lines below are the same thing as any of the others
-// but all of them yield the same, identical result
-// i.e. OOP, direct and continuation-passing styles
+// What follows is probably the most important point in this
+// playground.
+// _None_ of lines below are the same thing as any of the others
+// but all of them yield the same, identical result.
+// i.e. We have shown that OOP, direct and continuation-passing styles
 // can all be mechanically translated from one to the other.
 // and either application or composition can be used between functions.
 14 |>   doubler >>>   toString >>>   encloseInSpaces  // direct style
@@ -232,6 +240,10 @@ infixDoubleString(14)
 14 |>   doubler |>    toString |>    encloseInSpaces  // Continuation Passing Style
 14 |> \.doubler |>  \.toString |>  \.encloseInSpaces  // Continuation Passing Style
 14     .doubler      .toString      .encloseInSpaces  // OOP native style
+
+// It is precisely this equivalence that we want to capture in a
+// concurrent manner and it is precisely this that breaks when
+// any of the functions involved return Void.
 
 // writing the above out long hand..
 
@@ -257,14 +269,14 @@ let c = b  |> encloseInSpaces  // or encloseInSpaces(b)
 // but _are not_ the same thing
 (doubler >>> toString >>> encloseInSpaces)(14)  // Direct Style
 compose(doubler, compose(toString, encloseInSpaces))(14)
-14 |> doubler >>> toString >>> encloseInSpaces  // mixed style
-apply(14, compose(doubler, compose(toString, encloseInSpaces)))
+      14 |>       doubler >>>      toString >>> encloseInSpaces  // mixed style
+apply(14, compose(doubler, compose(toString,    encloseInSpaces)))
 
-14 |> doubler |>  toString >>> encloseInSpaces  // mixed style
-apply(apply(14, doubler), compose(toString, encloseInSpaces))
+            14 |> doubler |>        toString >>> encloseInSpaces  // mixed style
+apply(apply(14,   doubler), compose(toString,    encloseInSpaces))
 
-14 |> doubler >>> toString |>  encloseInSpaces  // mixed style
-apply(apply(14, compose(doubler, toString)), encloseInSpaces)
+            14 |>       doubler >>> toString |> encloseInSpaces  // mixed style
+apply(apply(14, compose(doubler,    toString)), encloseInSpaces)
 
                 14 |> doubler |> toString |> encloseInSpaces  // Continuation Passing Style
 apply(apply(apply(14, doubler),  toString),  encloseInSpaces)
@@ -273,15 +285,17 @@ apply(apply(apply(14, doubler),  toString),  encloseInSpaces)
 // and the continuation passing style are something that we
 // already knew as the Object-Oriented style
 14 |> doubler |>  toString |>  encloseInSpaces  // Continuation Passing Style
-      14.doubler .toString    .encloseInSpaces  // Object-Oriented Style
+14   .doubler    .toString    .encloseInSpaces  // Object-Oriented Style
 // [[[14 doubler] toString]    encloseInSpaces] // ObjC syntax
+// objc_msgSend(objc_msgSend(objc_msgSend(14, doubler),  toString),  encloseInSpaces) // What ObjC does...
 // encloseInSpaces(toString(doubler(14)))       // What the compiler does when |> is @inlinable
 
 // Conclusion: OO with immutable types is exactly equivalent to CPS
 
 
 // Now, what does `apply` look like if we _curry_ it?
-// ((A) -> R) -> R     NB This returned function is precisely the form of the Haskell Continuation
+//  NB This returned function is precisely the form of the Haskell Continuation monad
+// ((A) -> R) -> R
 func curriedApply<A, R>(
     _ a: A
 ) -> (@escaping (A) -> R) -> R {
@@ -343,7 +357,6 @@ public func invoke<A, R>(
 }
 
 // And then we _curry_ invoke
-
 func curriedInvoke<A, R>(
     _ f: @escaping (A) -> R
 ) -> (A) -> R {
@@ -353,7 +366,7 @@ func curriedInvoke<A, R>(
 // function operating on the supplied funcion.  Making it @inlinable allows the
 // compiler to, in fact remove it and just use the
 // native function invocation operation that is built in
-// to the language.  Hence there is never any need for us to write `invoke` it
+// to the language.  Hence there is never any need for us to write `invoke` - it
 // is native to the language.  It's the `apply` form which we have to introduce.
 
 // The Big Leap
@@ -451,7 +464,7 @@ func zip<A, B, R>(
     }
 }
 
-// Int the other we have to provide a means of connecting the inputs to the outputs
+// In the other form we have to provide a means of connecting the inputs to the outputs
 func zip<A, B, S, R>(
     _ c1: Continuation<S, A>, _ sink1: @escaping (S) -> A,
     _ c2: Continuation<S, B>, _ sink2: @escaping (S) -> B
@@ -461,7 +474,8 @@ func zip<A, B, S, R>(
     }
 }
 
-// And the free function form of zip corresponds to NIO's `and` operation between two Futures
+// And if we move the free function form of zip into Continuation,
+// it corresponds directly to NIO's `and` operation between two Futures
 extension Continuation where R == A {
     func and<B>(_ c2: Continuation<B, B>) -> Continuation<(A, B), R> {
         zip(self, c2)
@@ -495,7 +509,7 @@ struct Executor {
     }
 }
 
-// We can fit Threads, DispatchQueues, RunLoops and OpQueues directly
+// We can fit immediate invocation, Threads, DispatchQueues, RunLoops and OpQueues directly
 // into our Executor because they _all_ use the same form: `(() -> Void) -> Void`
 // for doing dispatch.
 // But (modulo that slight syntax inconvenience), that's just Continuation<Void, Void>
@@ -541,12 +555,12 @@ extension Continuation where R == Void {
     }
 }
 
-// so let's give that a name:
+// so let's "just" give that a name:
 typealias Just<A> = Continuation<A, Void>
 
 // But using our implemention of receive and subscribe
 // _forces_ the return type
-// to be Void _everywhere_ in the chain.  We have completely
+// to be Void _everywhere_ in the chain. And with that, we have completely
 // broken our ability to intersperse composition with application.
 
 // Observe:
@@ -584,8 +598,8 @@ let j2: Just<String> = Just(14)
 // But making Continuation return Void does have a really powerful
 // side benefit. It allows us to do a parallel
 // form of zip which is _thread safe_.
-// NB This is only possible bc of the Void return type on Just
-// Also note the small size of the critical section here.
+// NB This is only possible bc of the Void return type on `Just`.
+// Also note here the small size of the critical section, i.e.
 // (The parts between the lock and the unlock)
 func zip<A, B>(_ ja: Just<A>, _ jb: Just<B>) -> Just<(A,B)> {
     .init { downstream in
@@ -616,7 +630,7 @@ extension Continuation where R == Void {
 }
 
 // And _now_ we can make use of 4 threads concurrently,
-// just at the cost of not getting a return value.
+// "just" at the cost of getting a Void return value.
 let parallel = Just(())
     .receive(on: q.executor)
     .flatMap { zip(j1, j2) }
@@ -648,6 +662,20 @@ struct Func<A, B> {
         call(a)
     }
 }
+
+// (A) -> (A, W)
+// (State, Action, Environment) async -> (State, Publisher<Action>)  Reduce
+// (W, W) -> W
+//import Combine
+//struct Reducer<State, Action, Environment> {
+//    let reducer: (inout State, Action, Environment) -> PassthroughSubject<Action, Never>
+//}
+//struct Generator<A, W> {
+//    var a: A
+//    let generator: (inout A) -> (W)
+//    async var next: W? { generator(&self) }
+//}
+
 
 extension Func {
     func map<C>(_ f: @escaping (B) -> C) -> Func<A, C> {

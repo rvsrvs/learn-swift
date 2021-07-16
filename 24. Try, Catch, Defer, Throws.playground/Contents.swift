@@ -40,7 +40,7 @@ do {
         so = "we exited the scope "
     }
     so
-    let result4 = try throwSpecificError(shouldThrow: .firstError("this is an error of type 1"))
+    _ = try throwSpecificError(shouldThrow: .firstError("this is an error of type 1"))
 }
 catch OurError.firstError(let message) {
     "rethrow got: \(message)"

@@ -1,4 +1,0 @@
-
-/*:
-# Proerty Wrappers
- */
