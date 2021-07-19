@@ -95,11 +95,11 @@ type(of: Int.yetAnotherDoubler) // (Int) -> () -> Double
 // a function
 type(of: \Int.doubler)
 
-// These statements are exactly equivalent, however
+// These statements are exactly equivalent bc of the KeyPath <-> Func relationship
 doubler(14)
 14.doubler
 
-// Reminder for below I can _always_ rearrange arguments to a function
+// Reminder for below, I can _always_ rearrange arguments to a function
 func flip<A, B, C>(
     _ f: @escaping (A, B) -> C
 ) -> (B, A) -> C {
@@ -228,7 +228,7 @@ infixDoubleString(14)
 
 // What follows is probably the most important point in this
 // playground.
-// _None_ of lines below are the same thing as any of the others
+// _None_ of lines below are exactly the same thing as any of the others
 // but all of them yield the same, identical result.
 // i.e. We have shown that OOP, direct and continuation-passing styles
 // can all be mechanically translated from one to the other.
@@ -254,7 +254,8 @@ compose(doubler, compose(toString, encloseInSpaces))(14)
 
 // The last one
 apply(apply(apply(14, doubler), toString), encloseInSpaces)
-// apply @inlinable
+// apply @inlinable and once again we see that the compiler can turn
+// a chain of applies into function composition
 encloseInSpaces(apply(apply(14, doubler), toString))
 encloseInSpaces(toString(apply(14, doubler)))
 encloseInSpaces(toString(doubler(14)))
@@ -265,7 +266,8 @@ let a = 14 |> doubler          // or doubler(14)
 let b = a  |> toString         // or toString(a)
 let c = b  |> encloseInSpaces  // or encloseInSpaces(b)
 
-// In summary, all of these _do_ the same thing
+// In summary, each element of a pair below is exactly the same thing.
+// The indiviual pairs all do exactly the same thing...
 // but _are not_ the same thing
 (doubler >>> toString >>> encloseInSpaces)(14)  // Direct Style
 compose(doubler, compose(toString, encloseInSpaces))(14)
@@ -335,7 +337,6 @@ curriedCompose(doubler)(curriedCompose(toString)(encloseInSpaces))(14)
 // And that we can do this only because we have generics.  Generics
 // are absolutely critical to this ability to compose.
 
-
 // Interesting side-note: suppose we _flip_ the arguments to apply
 
 // Flipped form of apply (here called invoke) turns out to be the natively supported invocation form
@@ -363,7 +364,7 @@ func curriedInvoke<A, R>(
     f
 }
 // curried invoke just turns out to be the identity
-// function operating on the supplied funcion.  Making it @inlinable allows the
+// function operating on the supplied function.  Making it @inlinable allows the
 // compiler to, in fact remove it and just use the
 // native function invocation operation that is built in
 // to the language.  Hence there is never any need for us to write `invoke` - it
@@ -435,6 +436,7 @@ extension Continuation {
 Continuation(Continuation(Continuation(14)    (doubler))   (toString))(encloseInSpaces)
 Continuation(                          14).map(doubler).map(toString) (encloseInSpaces)
 
+// In fact if we inlined map, the compiler would reduce every bit of this to: function composition
 // so `map` on continuation is exactly the same as `apply` which we have shown to be the same as
 // OO method dispatch via `objc_msgSend`
 
@@ -493,9 +495,10 @@ combinedString2
 
 // And the above _starts_ to look like Combine and EventLoopFuture all of a sudden.
 // But... Theres a problem..  We can't write receive(on:) and subscribe(on:)
+// AND THIS IS WHY WE NEED ASYNC/AWAIT AND WHY IT NEEDS TO BE A LANGUAGE FEATURE
 // To see why, lets look at what Apple gives us for doing asynchronous work.
 
-// Note that Executor is (modulo a syntax issue) equivalent to Continuation<Void, Void>
+// Note that Executor is (modulo a minor syntax issue) equivalent to Continuation<Void, Void>
 // We introduce it as a separate type rather than a type alias solely bc of the
 // the syntax difference between () -> Void and (Void) -> Void
 import Foundation
@@ -512,7 +515,7 @@ struct Executor {
 // We can fit immediate invocation, Threads, DispatchQueues, RunLoops and OpQueues directly
 // into our Executor because they _all_ use the same form: `(() -> Void) -> Void`
 // for doing dispatch.
-// But (modulo that slight syntax inconvenience), that's just Continuation<Void, Void>
+// But (again modulo that slight syntax inconvenience), that's just Continuation<Void, Void>
 // Here's the proof:
 extension Executor {
     static var immediate: Self {
