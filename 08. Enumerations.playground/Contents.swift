@@ -132,16 +132,18 @@ StatusCode.otherResult.rawValue
  We can give enumerations many types. Here's one of type Character:
 */
 enum ASCIIControlCharacter: Character {
-	case tab = "\t"
-	case lineFeed = "\n"
-	case carriageReturn = "\r"
-	
-	/*: Note that only Int type enumerations can auto-increment. Since this is a Character type,
-	 the following line of code won't compile:
-	```
-	 case verticalTab
+    case tab = "\t"
+    case lineFeed = "\n"
+    case carriageReturn = "\r"
+    
+    /*:
+     Note that only Int type enumerations can auto-increment.
+     Since this is a Character type,
+     the following line of code won't compile:
      ```
- */
+     case verticalTab
+     ```
+     */
 }
 /*:
  Alternatively, we could also use Strings

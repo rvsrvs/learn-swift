@@ -40,7 +40,7 @@
  1. It eliminates an entire class of errors that arises from having
  invalid values for types.  If the cardinality is specified correctly
  it is impossible to have an invalid value.  You might get the specification
- wrong and have an inapprorpiate type for what you are trying to do
+ wrong and have an inappropriate type for what you are trying to do
  but that's a different problem.
  
  2. Most importantly, having correct cardinality on our types allows
@@ -61,7 +61,7 @@ var b = true
 b = false
 /*:
  `Bool` is a type with just two values: `true` and `false`.
- We can say what's in, (those two values) and what's out, everything else.
+ We can say what's in, (those two values) and what's out (everything else).
  Each element can be unambiguously identified.  The cardinality is two.
  This is definitely a type.
  
@@ -165,10 +165,10 @@ struct BoolLittleInt {
  could have the same type.  And some languages do exactly that.  Other languages
  say, no you have to name everything and once you give it a name
  that's it, the name alone determines the type.  Languages that use the name
- to delineate the type are said to have nominal types,
- languages that use the structure are said to have structural types.
+ to delineate the type are said to have `nominal` types,
+ languages that use the structure are said to have `structural` types.
  (NB The [Swift book](https://docs.swift.org/swift-book/ReferenceManual/Types.html):
- refers to these as `compound` types, but that's not what the PL
+ refers to these structural types as `compound` types, but that's not what the PL
  community calls them. They call them structural types and since
  I prefer that name and I'm the teacher and it's my playground,
  that's what we'll call them).
