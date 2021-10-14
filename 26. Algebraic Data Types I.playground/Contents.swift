@@ -225,6 +225,7 @@ nameTupTup
  let's make a value of that type.
  */
 var bb = BoolBool(b1: true, b2: false)
+
 /*:
  But we can't assign that value to or from the identical structural type.
  These statements won't compile because `bb` is nominal and `tuptup` is structural,
@@ -770,6 +771,7 @@ enum ThreeVoid {
     case two
     case three
 }
+
 /*:
  Still cardinality of three.  How bout with functions?
  
