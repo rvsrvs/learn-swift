@@ -25,6 +25,7 @@ var cancellable: AnyCancellable? = Timer
     .publish(every: 0.2, on: .main, in: .common)
     .autoconnect()
     .output(in: 0 ..< 5)
+    .receive(on: DispatchQueue.main)
     .sink { time in
         timesFired += 1
         print("Original timer fired \(timesFired) times")
