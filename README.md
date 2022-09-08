@@ -6,7 +6,7 @@ aka The Vanifesto
 
 ===========
 
-This repo is an ongoing project designed to facilitate a [course I teach in iOS development](https://www.summer.harvard.edu/course-catalog/courses/introduction-to-mobile-application-development-using-swift-and-ios/33540).
+This repo is an ongoing project designed to facilitate a course I teach in iOS development.
 
 The goal is to provide a broad reference to Swift language syntax for students new to the language and then focus in sharply on the parts of the language that make use of functional programming techniques.
 

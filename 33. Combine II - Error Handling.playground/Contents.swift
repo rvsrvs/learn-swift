@@ -56,6 +56,7 @@ extension MyOptional {
  The answer is that we don't want to change the type signature, we want to
  add the extra method:
  */
+// MyResult<T, E>
 extension MyResult {
     func map<U>(transform: (T) -> U) -> MyResult<U, E> {
         switch self {
