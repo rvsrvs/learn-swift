@@ -62,7 +62,7 @@ let pointfreeAs = zip(bs.flatMap(identity), cs.flatMap(identity))
 print(pointfreeAs)
 type(of: flip(A.interpolate))
 type(of: flip(A.interpolate)("pointfree interpolater"))
-
+ 
 /*:
  To truly understand the point-free style, you need to be sure that you grasp what is
  happening in the lines that include: `identity`, `A.init`, `flip` and `+`.
