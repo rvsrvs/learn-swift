@@ -1,5 +1,6 @@
 # To Do
 
+
 * Add a separate playground on all forms of map culminating in map on a new function type
 * Add a separate playground on all forms of zip culminating in zip on a new function type
 * Add a separate playground on all forms of flatMap culminating in flatMap on a new function type
