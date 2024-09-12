@@ -3,7 +3,6 @@
 ```
 aka The Vanifesto
 ```
-
 ===========
 
 This repo is an ongoing project designed to facilitate a course I teach in iOS development.
